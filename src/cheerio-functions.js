@@ -1,33 +1,3 @@
-// Private Functions 
-function getHtmlClass(parsedHtml, targetClass) {
-  const parsedClass = parsedHtml(`.${targetClass}`);
-  let arr = [];
-  parsedClass.each(function () {
-    const text = parsedHtml(this).text();
-    const attrClass = parsedHtml(this).attr('class');
-    arr.push({
-      text,
-      attrClass,
-      attrLink
-    })
-  });
-  return arr;
-}
-
-function getHtmlObj(parsedHtml, targetObj) {
-  const ParsedObject = parsedHtml(`${targetObj}`);
-  let arr = [];
-  ParsedObject.each(function () {
-    const text = parsedHtml(this).text();
-    const attrClass = parsedHtml(this).attr('class');
-    arr.push({
-      text,
-      attrClass
-    })
-  });
-  return arr
-}
-
 // Public Functions 
 function getTeamLinks(parsedHtml) {
   const parsedClass = parsedHtml(`.teamImageAndNameWrap`);
