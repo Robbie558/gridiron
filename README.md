@@ -15,6 +15,15 @@ npm i
 npm start
 ```
 
+### Docker
+
+```bash
+docker build --build-arg EXPOSE_PORT=<container_port> -t <tag> -f Dockerfile 
+docker run -p 127.0.0.1:<local_port>:<container_port> <tag>:latest npm start
+```
+
+**Note**: The `<container_port>` specified must match the `PORT` set within the the `config.js`.
+
 ## Usage 
 You can then issue API requests aginst the following endpoints:
 
