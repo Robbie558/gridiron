@@ -3,6 +3,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 const { PORT, BASE_URL } = require('../config.js');
+const utils = require('./utils/utils.js');
 const { getTeamLinks, getLeagueTitle, getCurrentWeekScores, getHistoricWeekScores, getweeksInYear } = require('./cheerio-functions.js');
 
 // Start express app on defined port
@@ -45,8 +46,7 @@ app.get(`/api/:league_id/teams`, (req, res) => {
       const leagueHtmlParsed = cheerio.load(response.data);
       titleArr = getLeagueTitle(leagueHtmlParsed);
       teamLinkArr = getTeamLinks(leagueHtmlParsed);
-      const jsonTeamsArray = JSON.stringify(teamLinkArr);
-      console.log(`Results for league :league_id: ${jsonTeamsArray}`);
+      utils.logJsonArray(teamLinkArr);
       res.send(teamLinkArr);
     }).catch(err => console.log(err));
 });
@@ -58,8 +58,7 @@ app.get(`/api/:league_id/scores`, (req, res) => {
     let scoresArr = [];
     const leagueHtmlParsed = cheerio.load(response.data);
     scoresArr = getCurrentWeekScores(leagueHtmlParsed);
-    const jsonScoresArr = JSON.stringify(scoresArr);
-    console.log(`Results for league :league_id: ${jsonScoresArr}`);
+    utils.logJsonArray(scoresArr);
     res.send(scoresArr);
   }).catch(err => console.log(err));
 });
@@ -71,8 +70,7 @@ app.get(`/api/:league_id/:year/scores/:week`, (req, res) => {
     let scoresArr = [];
     const leagueHtmlParsed = cheerio.load(response.data);
     scoresArr = getHistoricWeekScores(leagueHtmlParsed);
-    const jsonScoresArr = JSON.stringify(scoresArr);
-    console.log(`Results for league :league_id: ${jsonScoresArr}`);
+    utils.logJsonArray(scoresArr);
     res.send(scoresArr);
   }).catch(err => console.log(err));
 });
