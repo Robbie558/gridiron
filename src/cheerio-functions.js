@@ -35,22 +35,15 @@ function getLeagueTitle(parsedHtml) {
 function getCurrentWeekScores(parsedHtml) {
   let arr = [];
   parsedHtml(`.teamNav`).children('ul').first().children('li').each(function (i, e) {
-    let scores = [];
+    let scores = [], matchup = [];
     const matchupTitle = parsedHtml(this).children('a').attr('title');
     const firstOpponentName = parsedHtml(this).children('a').children('.first').children('em').html();
     const firstOpponentScore = parsedHtml(this).children('a').children('.first').children('.teamTotal').html();
     const lastOpponentName = parsedHtml(this).children('a').children('.last').children('em').html();
     const lastOpponentScore = parsedHtml(this).children('a').children('.last').children('.teamTotal').html();
-    scores.push({
-      firstOpponentName,
-      firstOpponentScore,
-      lastOpponentName,
-      lastOpponentScore
-    })
-    arr.push({
-      matchupTitle,
-      scores,
-    })
+    scores.push({firstOpponentName,firstOpponentScore,lastOpponentName,lastOpponentScore});
+    matchup.push({matchupTitle,scores});
+    arr.push({matchup});
   });
   return arr;
 }
@@ -73,7 +66,7 @@ function getTeamNames(parsedHtml) {
 function getHistoricWeekScores(parsedHtml) {
   let arr = [];
   parsedHtml('.matchup').each(function (i, e) {
-    let scores = [];
+    let scores = [], matchup = [];
     const firstTeamName = parsedHtml(this).children('.teamWrap-1').children('a').text();
     const firstTeamOwner = parsedHtml(this).children('.teamWrap-1').children().children().children().children('a').text();
     const firstTeamScore = parsedHtml(this).children('.teamWrap-1').children('.teamTotal').html();
@@ -93,11 +86,8 @@ function getHistoricWeekScores(parsedHtml) {
       secondTeamOwner,
       secondTeamScore
     })
-    arr.push({
-      matchupTitle,
-      matchupWinner,
-      scores,
-    })
+    matchup.push({matchupTitle,scores});
+    arr.push({matchup})
   })
   return arr;
 }
