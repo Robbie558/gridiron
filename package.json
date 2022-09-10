@@ -4,7 +4,7 @@
   "description": "A webscraper for fantasy football scores from popular gridiron football leauge",
   "main": "./src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage --passWithNoTests",
     "start": "nodemon index.js"
   },
   "keywords": [
