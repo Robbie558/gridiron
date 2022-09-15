@@ -41,9 +41,9 @@ function getCurrentWeekScores(parsedHtml) {
     const firstOpponentScore = parsedHtml(this).children('a').children('.first').children('.teamTotal').html();
     const lastOpponentName = parsedHtml(this).children('a').children('.last').children('em').html();
     const lastOpponentScore = parsedHtml(this).children('a').children('.last').children('.teamTotal').html();
-    scores.push({firstOpponentName,firstOpponentScore,lastOpponentName,lastOpponentScore});
-    matchup.push({matchupTitle,scores});
-    arr.push({matchup});
+    scores.push({ firstOpponentName, firstOpponentScore, lastOpponentName, lastOpponentScore });
+    matchup.push({ matchupTitle, scores });
+    arr.push({ matchup });
   });
   return arr;
 }
@@ -75,8 +75,8 @@ function getHistoricWeekScores(parsedHtml) {
     const secondTeamScore = parsedHtml(this).children('.teamWrap-2').children('.teamTotal').html();
     const matchupTitle = firstTeamName + ' vs ' + secondTeamName;
     let matchupWinner = `${firstTeamName} (${firstTeamOwner})`
-    if (parseFloat(secondTeamScore) > parseFloat(firstTeamScore)) { 
-      matchupWinner = `${secondTeamName} (${secondTeamOwner})` 
+    if (parseFloat(secondTeamScore) > parseFloat(firstTeamScore)) {
+      matchupWinner = `${secondTeamName} (${secondTeamOwner})`
     }
     scores.push({
       firstTeamName,
@@ -86,29 +86,51 @@ function getHistoricWeekScores(parsedHtml) {
       secondTeamOwner,
       secondTeamScore
     })
-    matchup.push({matchupTitle,scores});
-    arr.push({matchup})
+    matchup.push({ matchupTitle, matchupWinner, scores });
+    arr.push({ matchup })
   })
   return arr;
 }
 
 function getweeksInYear(parsedHtml) {
-  let lastWeekText = '';
-  const parsedClass = parsedHtml(`.scheduleWeekNav`);
-  const weekList = parsedClass.children()
+  let returnArr = [];
+  const weekList = parsedHtml(`.scheduleWeekNav`).children().children();
   weekList.each(function () {
-    let class_attrib = JSON.stringify(this.attribs);
-    if (/ww ww-[0-9].*last/.test(class_attrib)) {
-      lastWeekText = parsedHtml(this).text();
+    if (parsedHtml(this).children('.title').html() != null) {
+      returnArr.push(parsedHtml(this).children('.title').text());
     }
   });
-  return lastWeekText;
+  return returnArr;
 }
+
+function getPlayoffWeeks(parsedHtml) {
+  let returnArr = [];
+  const playoffWeekList = parsedHtml(`.weekLabels`).children('ul').children('li');
+  playoffWeekList.each(function () {
+    returnArr.push(parsedHtml(this).text().replace(/\D/g, ""))
+  });
+  return returnArr;
+}
+
+function getYearRosterSettings(parsedHtml) {
+  let returnArr = [];
+  const rosterList = parsedHtml(`.positionsAndRoster`).children(`li`);
+  rosterList.each(function () {
+    const rosterPostion = parsedHtml(this).children(`em`).html();
+    const rosterLimit = parsedHtml(this).children(`.value`).html();
+    let roster = {rosterPostion,rosterLimit }
+    returnArr.push(roster)
+  });
+  return returnArr;
+}
+
 
 module.exports = {
   getTeamLinks,
   getLeagueTitle,
   getCurrentWeekScores,
   getHistoricWeekScores,
-  getweeksInYear
+  getweeksInYear,
+  getPlayoffWeeks,
+  getYearRosterSettings
 }

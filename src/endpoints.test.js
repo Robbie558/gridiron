@@ -1,4 +1,10 @@
-const { yearTopScores, leagueListTeams, currentWeekListScores, historicalWeekListScore, health } = require('./endpoints.js');
+const { yearTopScores, currentListTeams, currentWeekListScores, historicalWeekListScore, health } = require('./endpoints.js');
+
+const express = require('express');
+const axios = require('axios');
+const cheerio = require('cheerio');
+
+const { BASE_URL } = require('../config.js');
 
 describe('Endpoint Tests', () => {
 
@@ -6,7 +12,7 @@ describe('Endpoint Tests', () => {
     jest.restoreAllMocks();
   });
 
-  describe('leagueListTeams', () => {
+  describe('currentListTeams', () => {
     const mockResponse = [
       {
         teamId: 0,
@@ -77,30 +83,30 @@ describe('Endpoint Tests', () => {
     }];
     const mock = jest
       .fn()
-      .mockName('mockleagueListTeams')
+      .mockName('mockcurrentListTeams')
       .mockReturnValueOnce(mockResponse);
 
     const mockLeagueUrl = 'https://fantasy.nfl.com/league/0000000';
     const mockRes = {};
-    const mockleagueListTeams = mock(mockLeagueUrl, mockRes);
+    const mockcurrentListTeams = mock(mockLeagueUrl, mockRes);
 
     it('should return an array of objects', async () => {
       expect(mock).toHaveBeenCalledTimes(1);
       expect(mock).toHaveBeenCalledWith('https://fantasy.nfl.com/league/0000000', {});
-      expect(mockleagueListTeams).toBeDefined();
-      expect(mockleagueListTeams).toBeInstanceOf(Array);
-      expect(mockleagueListTeams).toHaveLength(12); // TODO - Link to number of players in leage
+      expect(mockcurrentListTeams).toBeDefined();
+      expect(mockcurrentListTeams).toBeInstanceOf(Array);
+      expect(mockcurrentListTeams).toHaveLength(12); // TODO - Link to number of players in leage
     });
 
     it('with expected properties', async () => {
-      expect(mockleagueListTeams[0]).toHaveProperty('teamId', 'teamName', 'teamLink');
-      expect(mockleagueListTeams).toEqual(expect.arrayContaining(expected));
+      expect(mockcurrentListTeams[0]).toHaveProperty('teamId', 'teamName', 'teamLink');
+      expect(mockcurrentListTeams).toEqual(expect.arrayContaining(expected));
     });
 
     // TODO
     // it('verified against live reponse', async () => {
     //   const getSpy = jest.spyOn(axios, 'get').mockResolvedValueOnce({ data: '<div>teresa teng</div>' });
-    //   const actual = app.get(`/api/:league_id/teams`, (req,res) => leagueListTeams(req,res));
+    //   const actual = app.get(`/api/:league_id/teams`, (req,res) => currentListTeams(req,res));
     //   expect(actual).toEqual('<div>teresa teng</div>');
     //   expect(getSpy).toBeCalledWith('http://localhost:8080');
     // });
@@ -246,7 +252,7 @@ describe('Endpoint Tests', () => {
     // TODO
     // it('verified against live reponse', async () => {
     //   const getSpy = jest.spyOn(axios, 'get').mockResolvedValueOnce({ data: '<div>teresa teng</div>' });
-    //   const actual = app.get(`/api/:league_id/teams`, (req,res) => leagueListTeams(req,res));
+    //   const actual = app.get(`/api/:league_id/teams`, (req,res) => currentListTeams(req,res));
     //   expect(actual).toEqual('<div>teresa teng</div>');
     //   expect(getSpy).toBeCalledWith('http://localhost:8080');
     // });
@@ -406,7 +412,7 @@ describe('Endpoint Tests', () => {
     // TODO
     // it('verified against live reponse', async () => {
     //   const getSpy = jest.spyOn(axios, 'get').mockResolvedValueOnce({ data: '<div>teresa teng</div>' });
-    //   const actual = app.get(`/api/:league_id/teams`, (req,res) => leagueListTeams(req,res));
+    //   const actual = app.get(`/api/:league_id/teams`, (req,res) => currentListTeams(req,res));
     //   expect(actual).toEqual('<div>teresa teng</div>');
     //   expect(getSpy).toBeCalledWith('http://localhost:8080');
     // });
