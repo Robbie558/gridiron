@@ -25,7 +25,7 @@ function getLeagueTitle(parsedHtml) {
 
 function getCurrentWeekScores(parsedHtml) {
   let arr = [];
-  parsedHtml(`.teamNav`).children('ul').first().children('li').each(function (i, e) {
+  parsedHtml(`.teamNav`).children('ul').first().children('li').each(function () {
     let scores = [], matchup = [];
     const matchupTitle = parsedHtml(this).children('a').attr('title');
     const firstOpponentName = parsedHtml(this).children('a').children('.first').children('em').html();
@@ -41,7 +41,7 @@ function getCurrentWeekScores(parsedHtml) {
 
 function getHistoricWeekScores(parsedHtml) {
   let arr = [];
-  parsedHtml('.matchup').each(function (i, e) {
+  parsedHtml('.matchup').each(function () {
     let scores = [], matchup = [];
     const firstTeamName = parsedHtml(this).children('.teamWrap-1').children('a').text();
     const firstTeamOwner = parsedHtml(this).children('.teamWrap-1').children().children().children().children('a').text();
@@ -104,22 +104,40 @@ function getHistoricFinalStandings(parsedHtml) {
   let returnArr = [];
   const standingsList = parsedHtml(`.results`).children().children(`li`);
   standingsList.each(function () {
-    let standingsPostion = parsedHtml(this).children(`.place`).html();
-    standingsPostion = standingsPostion.replace(/[a-z].*/, ``);
-    const standingsTeamName = parsedHtml(this).children(`.value`).children().first().html();
-    const standingsTeamUrl = parsedHtml(this).children(`.value`).children().first().attr(`href`);
-    returnArr.push({standingsPostion, standingsTeamName, standingsTeamUrl});
+    let teamRank = parsedHtml(this).children(`.place`).html();
+    teamRank = teamRank.replace(/[a-z].*/, ``);
+    const teamName = parsedHtml(this).children(`.value`).children().first().html();
+    const teamUrl = parsedHtml(this).children(`.value`).children().first().attr(`href`);
+    returnArr.push({teamRank, teamName, teamUrl});
   });
   return returnArr;
 }
 
+// function getHistoricRegularStandings(parsedHtml) {
+//   let returnArr = [];
+//   const standingsList = parsedHtml(`.tableType-team`).children(`tbody`).children();
+//   console.log(standingsList.html());
+//   console.log(`-------------------------------------------------`);
+//   standingsList.each(function () {
+//     console.log(parsedHtml(this).html());
+//     console.log(`---`);
+//   });
+//   return returnArr;
+// }
+
 function getHistoricRegularStandings(parsedHtml) {
   let returnArr = [];
-  const standingsList = parsedHtml(`#leagueHistoryStandings`).children().children().children().children().children(`.team-`);
-  console.log(standingsList.html());
-  // standingsList.each(function () {
-  //   console.log(parsedHtml(this).children().html());
-  // });
+  const standingsList = parsedHtml(`.tableType-team`).children(`tbody`).children();
+  standingsList.each(function () {
+    const teamRank = parsedHtml(this).children(`.teamRank`).children(`.teamRank`).text();
+    const teamName = parsedHtml(this).children(`.teamImageAndName`).children(`.teamImageAndNameWrap`).children(`.teamImg`).children().attr(`alt`);
+    const teamRecord = parsedHtml(this).children(`.teamRecord`).text();
+    const teamWinPercent = parsedHtml(this).children(`.teamWinPct`).text();
+    const teamStreak = parsedHtml(this).children(`.teamStreak`).text();
+    const teamPtsFor = parsedHtml(this).children(`.teamPts`).first().text();
+    const teamPtsAgainst = parsedHtml(this).children(`.teamPts`).last().text();
+    returnArr.push({teamRank, teamName, teamRecord, teamWinPercent, teamStreak, teamPtsFor, teamPtsAgainst});
+  });
   return returnArr;
 }
 
