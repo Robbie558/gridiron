@@ -17,19 +17,10 @@ function getTeamLinks(parsedHtml) {
   return arr;
 }
 
+// TODO - Find a better source for this information
 function getLeagueTitle(parsedHtml) {
-  const parsedClass = parsedHtml(`.title`);
-  let arr = [];
-  parsedClass.each(function () {
-    const text = parsedHtml(this).text();
-    const ParsedLink = parsedHtml(this).children().first();
-    const attrClass = ParsedLink.attr('class');
-    arr.push({
-      text,
-      attrClass
-    })
-  });
-  return arr;
+  const result = parsedHtml(`.title`).first().text();
+  return result.replace(/ Home/,``);
 }
 
 function getCurrentWeekScores(parsedHtml) {
@@ -46,21 +37,6 @@ function getCurrentWeekScores(parsedHtml) {
     arr.push({ matchup });
   });
   return arr;
-}
-
-function getTeamNames(parsedHtml) {
-  let teamArr = [];
-  const parsedClass = parsedHtml(`.scheduleContent`);
-  const teams = parsedClass.children().children().children().children().children();
-  teams.each(function () {
-    let class_attrib = JSON.stringify(this.attribs);
-    if (/teamName teamId-[0-9]/.test(class_attrib)) {
-      const teamName = parsedHtml(this).text();
-      let team = { "Name": teamName };
-      teamArr.push(team);
-    }
-  });
-  return teamArr;
 }
 
 function getHistoricWeekScores(parsedHtml) {
@@ -124,12 +100,36 @@ function getYearRosterSettings(parsedHtml) {
   return returnArr;
 }
 
+function getHistoricFinalStandings(parsedHtml) {
+  let returnArr = [];
+  const standingsList = parsedHtml(`.results`).children().children(`li`);
+  standingsList.each(function () {
+    let standingsPostion = parsedHtml(this).children(`.place`).html();
+    standingsPostion = standingsPostion.replace(/[a-z].*/, ``);
+    const standingsTeamName = parsedHtml(this).children(`.value`).children().first().html();
+    const standingsTeamUrl = parsedHtml(this).children(`.value`).children().first().attr(`href`);
+    returnArr.push({standingsPostion, standingsTeamName, standingsTeamUrl});
+  });
+  return returnArr;
+}
+
+function getHistoricRegularStandings(parsedHtml) {
+  let returnArr = [];
+  const standingsList = parsedHtml(`#leagueHistoryStandings`).children().children().children().children().children(`.team-`);
+  console.log(standingsList.html());
+  // standingsList.each(function () {
+  //   console.log(parsedHtml(this).children().html());
+  // });
+  return returnArr;
+}
 
 module.exports = {
   getTeamLinks,
   getLeagueTitle,
   getCurrentWeekScores,
   getHistoricWeekScores,
+  getHistoricFinalStandings,
+  getHistoricRegularStandings,
   getweeksInYear,
   getPlayoffWeeks,
   getYearRosterSettings

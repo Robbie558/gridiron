@@ -50,11 +50,17 @@ Retrieving metadata for a given year of a fantasy league (Roster Configuration, 
 curl -X GET http://localhost:8080/api/<league_id>/<year>/metadata
 ```
 
+Retrieving metadata for a given year of a fantasy league (Roster Configuration, Season Length, Play Period):
+```bash
+curl -X GET http://localhost:8080/api/<league_id>/<year>/metadata
+```
+
 All results returned wil be JSON formatted.
 
 ## Roadmap
 
-* Year end Standings - https://fantasy.nfl.com/league/2285751/history/2020/standings
+* Final Year End Standings - https://fantasy.nfl.com/league/2285751/history/2020/standings
+* Regular Season Year End Standings - https://fantasy.nfl.com/league/2285751/history/2021/standings?historyStandingsType=regular
 * Toilet Bowl - https://fantasy.nfl.com/league/2285751/history/2020/playoffs?bracketType=consolation&standingsTab=playoffs
 * Champ Bowl - https://fantasy.nfl.com/league/2285751/history/2020/playoffs?bracketType=championship&standingsTab=playoffs
 * Bench Points per historic week - https://fantasy.nfl.com/league/2285751/history/2020/teamhome?statCategory=stats&statSeason=2020&statType=weekStats&statWeek=1&teamId=11&week=1

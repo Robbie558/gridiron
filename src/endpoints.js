@@ -1,36 +1,60 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const { getTeamLinks, getLeagueTitle, getCurrentWeekScores, getHistoricWeekScores, getweeksInYear, getPlayoffWeeks, getYearRosterSettings } = require('./cheerio-functions.js');
+const { getTeamLinks, getLeagueTitle, getCurrentWeekScores, getHistoricWeekScores, getHistoricFinalStandings, getHistoricRegularStandings, getweeksInYear, getPlayoffWeeks, getYearRosterSettings } = require('./cheerio-functions.js');
 const utils = require('./utils/utils.js');
-
-const { BASE_URL } = require('../config.js');
 
 // Endpoints
 function yearMetadata(targetUrl, res) {
-    // Get weeks in year
-    let weekArr = [], playoffWeekArr = [], rosterArr = [], returnArr = [];
     console.log(`Week Count URL: ${targetUrl}`);
+    const titleUrl = targetUrl.replace(/history.*/, ``);
+    console.log(`Title Week Count URL: ${titleUrl}`)
     const playoffUrl = targetUrl.replace(/schedule\?.*/, `playoffs`);
     console.log(`Playoff Week Count URL: ${playoffUrl}`);
     const settingsUrl = targetUrl.replace(/schedule\?.*/, `settings`);
     console.log(`Settings URL: ${settingsUrl}`);
     axios.all([
         axios.get(targetUrl),
+        axios.get(titleUrl),
         axios.get(playoffUrl),
-        axios.get(settingsUrl)]).then(axios.spread((weekRes, playoffWeekRes, settingsRes) => {
+        axios.get(settingsUrl)]).then(axios.spread((weekRes, titleRes, playoffWeekRes, settingsRes) => {
+            let  returnArr = [];
             // Get weeks in year
             const leagueHtmlParsed = cheerio.load(weekRes.data);
-            weekArr = getweeksInYear(leagueHtmlParsed);
+            const weekArr = getweeksInYear(leagueHtmlParsed);
+            // Get League Title (Why is this so hard?!)
+            const titleHtmlParsed  = cheerio.load(titleRes.data);
+            const leagueTitle = getLeagueTitle(titleHtmlParsed);
             // Get playoff weeks in year
             const playoffHtmlParsed = cheerio.load(playoffWeekRes.data);
-            playoffWeekArr = getPlayoffWeeks(playoffHtmlParsed);
+            const playoffWeekArr = getPlayoffWeeks(playoffHtmlParsed);
             // Get season roster settings
             const settingsHtmlParsed = cheerio.load(settingsRes.data);
-            rosterArr = getYearRosterSettings(settingsHtmlParsed);
-            returnArr.push({weekArr, playoffWeekArr, rosterArr});
+            const rosterArr = getYearRosterSettings(settingsHtmlParsed);
+            returnArr.push({ leagueTitle, weekArr, playoffWeekArr, rosterArr});
             res.send(returnArr);
         })).catch(err => console.log(err));
+}
+
+function historicalYearFinalStandings(targetUrl, res) {
+    console.log(`URL: ${targetUrl}`);
+    axios.get(targetUrl).then(response => {
+        const leagueHtmlParsed = cheerio.load(response.data);
+        let leagueStandingsArr = getHistoricFinalStandings(leagueHtmlParsed);
+        utils.logJsonArray(leagueStandingsArr);
+        res.send(leagueStandingsArr);
+    }).catch(err => console.log(err));
+}
+
+function historicalYearRegularStandings(targetUrl, res) {
+    console.log(`URL: ${targetUrl}`);
+    axios.get(targetUrl).then(response => {
+        //console.log(response.data);
+        const leagueHtmlParsed = cheerio.load(response.data);
+        let leagueStandingsArr = getHistoricRegularStandings(leagueHtmlParsed);
+        //utils.logJsonArray(leagueStandingsArr);
+        res.send(leagueStandingsArr);
+    }).catch(err => console.log(err));
 }
 
 function currentListTeams(targetUrl, res) {
@@ -70,9 +94,10 @@ function health(res, port) {
 
 module.exports = {
     yearMetadata,
-    //yearPlayoffResults,
     currentListTeams,
     currentWeekListScores,
     historicalWeekListScore,
+    historicalYearFinalStandings,
+    historicalYearRegularStandings,
     health
 }

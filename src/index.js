@@ -2,7 +2,7 @@ const express = require('express');
 
 const { BASE_URL, PORT } = require('../config.js');
 
-const { yearMetadata, currentListTeams, currentWeekListScores, historicalWeekListScore, health } = require('./endpoints.js');
+const { historicalYearFinalStandings, historicalYearRegularStandings, historicalWeekListScore, currentListTeams, currentWeekListScores, yearMetadata, health } = require('./endpoints.js');
 
 // Start express app on defined port
 const app = express();
@@ -13,7 +13,7 @@ app.get(`/_health`, (req, res) => health(res, PORT));
 
 app.get(`/api/:league_id/teams`, (req, res) => {
   const targetUrl = BASE_URL + req.params.league_id;
-  currentListTeams(targetUrl,res);
+  currentListTeams(targetUrl, res);
 });
 
 app.get(`/api/:league_id/scores`, (req, res) => {
@@ -24,6 +24,17 @@ app.get(`/api/:league_id/scores`, (req, res) => {
 app.get(`/api/:league_id/:year/scores/:week`, (req, res) => {
   const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/schedule" + "?gameSeason=" + req.params.year + "&leagueId=" + req.params.league_id + "&scheduleDetail=" + req.params.week + "&scheduleType=week" + "&standingsTab=schedule";
   historicalWeekListScore(targetUrl, res);
+});
+
+app.get(`/api/:league_id/:year/standings/:standingType`, (req, res) => {
+  if (req.params.standingType == "final") {
+    const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/standings?historyStandingsType=final";
+    historicalYearFinalStandings(targetUrl, res);
+  }
+  else {
+    const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/standings?historyStandingsType=regular";
+    historicalYearRegularStandings(targetUrl, res);
+  }
 });
 
 app.get(`/api/:league_id/:year/metadata`, (req, res) => {
