@@ -1,20 +1,16 @@
 // Public Functions 
 function getTeamLinks(parsedHtml) {
   const parsedClass = parsedHtml(`.teamImageAndNameWrap`);
-  let arr = [];
+  let returnArr = [];
   let teamId = 0;
   parsedClass.each(function () {
     const teamName = parsedHtml(this).text();
     const ParsedLink = parsedHtml(this).children().first();
     const teamLink = ParsedLink.attr('href');
-    arr.push({
-      teamId,
-      teamName,
-      teamLink
-    })
+    returnArr.push({teamId,teamName,teamLink})
     teamId++;
   });
-  return arr;
+  return returnArr;
 }
 
 // TODO - Find a better source for this information
@@ -24,25 +20,23 @@ function getLeagueTitle(parsedHtml) {
 }
 
 function getCurrentWeekScores(parsedHtml) {
-  let arr = [];
+  let returnArr = [];
   parsedHtml(`.teamNav`).children('ul').first().children('li').each(function () {
-    let scores = [], matchup = [];
     const matchupTitle = parsedHtml(this).children('a').attr('title');
     const firstOpponentName = parsedHtml(this).children('a').children('.first').children('em').html();
     const firstOpponentScore = parsedHtml(this).children('a').children('.first').children('.teamTotal').html();
     const lastOpponentName = parsedHtml(this).children('a').children('.last').children('em').html();
     const lastOpponentScore = parsedHtml(this).children('a').children('.last').children('.teamTotal').html();
-    scores.push({ firstOpponentName, firstOpponentScore, lastOpponentName, lastOpponentScore });
-    matchup.push({ matchupTitle, scores });
-    arr.push({ matchup });
+    scores = { firstOpponentName, firstOpponentScore, lastOpponentName, lastOpponentScore } ;
+    matchup = { matchupTitle, scores };
+    returnArr.push(matchup);
   });
-  return arr;
+  return returnArr;
 }
 
 function getHistoricWeekScores(parsedHtml) {
-  let arr = [];
+  let returnArr = [];
   parsedHtml('.matchup').each(function () {
-    let scores = [], matchup = [];
     const firstTeamName = parsedHtml(this).children('.teamWrap-1').children('a').text();
     const firstTeamOwner = parsedHtml(this).children('.teamWrap-1').children().children().children().children('a').text();
     const firstTeamScore = parsedHtml(this).children('.teamWrap-1').children('.teamTotal').html();
@@ -54,18 +48,11 @@ function getHistoricWeekScores(parsedHtml) {
     if (parseFloat(secondTeamScore) > parseFloat(firstTeamScore)) {
       matchupWinner = `${secondTeamName} (${secondTeamOwner})`
     }
-    scores.push({
-      firstTeamName,
-      firstTeamOwner,
-      firstTeamScore,
-      secondTeamName,
-      secondTeamOwner,
-      secondTeamScore
-    })
-    matchup.push({ matchupTitle, matchupWinner, scores });
-    arr.push({ matchup })
+    scores = { firstTeamName, firstTeamOwner, firstTeamScore, secondTeamName, secondTeamOwner, secondTeamScore };
+    matchup = { matchupTitle, matchupWinner, scores };
+    returnArr.push(matchup)
   })
-  return arr;
+  return returnArr;
 }
 
 function getweeksInYear(parsedHtml) {
@@ -112,18 +99,6 @@ function getHistoricFinalStandings(parsedHtml) {
   });
   return returnArr;
 }
-
-// function getHistoricRegularStandings(parsedHtml) {
-//   let returnArr = [];
-//   const standingsList = parsedHtml(`.tableType-team`).children(`tbody`).children();
-//   console.log(standingsList.html());
-//   console.log(`-------------------------------------------------`);
-//   standingsList.each(function () {
-//     console.log(parsedHtml(this).html());
-//     console.log(`---`);
-//   });
-//   return returnArr;
-// }
 
 function getHistoricRegularStandings(parsedHtml) {
   let returnArr = [];

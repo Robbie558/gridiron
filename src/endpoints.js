@@ -49,10 +49,9 @@ function historicalYearFinalStandings(targetUrl, res) {
 function historicalYearRegularStandings(targetUrl, res) {
     console.log(`URL: ${targetUrl}`);
     axios.get(targetUrl).then(response => {
-        //console.log(response.data);
         const leagueHtmlParsed = cheerio.load(response.data);
         let leagueStandingsArr = getHistoricRegularStandings(leagueHtmlParsed);
-        //utils.logJsonArray(leagueStandingsArr);
+        utils.logJsonArray(leagueStandingsArr);
         res.send(leagueStandingsArr);
     }).catch(err => console.log(err));
 }

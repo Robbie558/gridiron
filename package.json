@@ -2,6 +2,10 @@
   "name": "gridiron",
   "version": "1.0.0",
   "description": "A webscraper for fantasy football scores from popular gridiron football leauge",
+  "engines" : { 
+    "npm" : ">=8.5.0",
+    "node" : ">=16.14.2"
+  },
   "main": "./src/index.js",
   "scripts": {
     "test": "jest --coverage --passWithNoTests",
