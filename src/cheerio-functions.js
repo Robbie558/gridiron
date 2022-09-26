@@ -7,7 +7,7 @@ function getTeamLinks(parsedHtml) {
     const teamName = parsedHtml(this).text();
     const ParsedLink = parsedHtml(this).children().first();
     const teamLink = ParsedLink.attr('href');
-    returnArr.push({teamId,teamName,teamLink})
+    returnArr.push({ teamId, teamName, teamLink })
     teamId++;
   });
   return returnArr;
@@ -16,7 +16,7 @@ function getTeamLinks(parsedHtml) {
 // TODO - Find a better source for this information
 function getLeagueTitle(parsedHtml) {
   const result = parsedHtml(`.title`).first().text();
-  return result.replace(/ Home/,``);
+  return result.replace(/ Home/, ``);
 }
 
 function getCurrentWeekScores(parsedHtml) {
@@ -27,7 +27,7 @@ function getCurrentWeekScores(parsedHtml) {
     const firstOpponentScore = parsedHtml(this).children('a').children('.first').children('.teamTotal').html();
     const lastOpponentName = parsedHtml(this).children('a').children('.last').children('em').html();
     const lastOpponentScore = parsedHtml(this).children('a').children('.last').children('.teamTotal').html();
-    scores = { firstOpponentName, firstOpponentScore, lastOpponentName, lastOpponentScore } ;
+    scores = { firstOpponentName, firstOpponentScore, lastOpponentName, lastOpponentScore };
     matchup = { matchupTitle, scores };
     returnArr.push(matchup);
   });
@@ -81,7 +81,7 @@ function getYearRosterSettings(parsedHtml) {
   rosterList.each(function () {
     const rosterPostion = parsedHtml(this).children(`em`).html();
     const rosterLimit = parsedHtml(this).children(`.value`).html();
-    let roster = {rosterPostion,rosterLimit }
+    let roster = { rosterPostion, rosterLimit }
     returnArr.push(roster)
   });
   return returnArr;
@@ -95,7 +95,7 @@ function getHistoricFinalStandings(parsedHtml) {
     teamRank = teamRank.replace(/[a-z].*/, ``);
     const teamName = parsedHtml(this).children(`.value`).children().first().html();
     const teamUrl = parsedHtml(this).children(`.value`).children().first().attr(`href`);
-    returnArr.push({teamRank, teamName, teamUrl});
+    returnArr.push({ teamRank, teamName, teamUrl });
   });
   return returnArr;
 }
@@ -111,7 +111,50 @@ function getHistoricRegularStandings(parsedHtml) {
     const teamStreak = parsedHtml(this).children(`.teamStreak`).text();
     const teamPtsFor = parsedHtml(this).children(`.teamPts`).first().text();
     const teamPtsAgainst = parsedHtml(this).children(`.teamPts`).last().text();
-    returnArr.push({teamRank, teamName, teamRecord, teamWinPercent, teamStreak, teamPtsFor, teamPtsAgainst});
+    returnArr.push({ teamRank, teamName, teamRecord, teamWinPercent, teamStreak, teamPtsFor, teamPtsAgainst });
+  });
+  return returnArr;
+}
+
+function getHistoricPlayoffs(parsedHtml) {
+  let returnArr = [];
+  //Week
+  parsedHtml(`.playoffContent`).children().each(function () {
+    //Matchup
+    let playoffWeek = parsedHtml(this).children(`h4`).text();
+    parsedHtml(this).children(`ul`).children(`li`).each(function () {
+      const matchupName = parsedHtml(this).children(`h5`).text();
+      let matchupType = "Bye";
+      let matchupWinner = "";
+      //Teams
+      let teamArr = [];
+      parsedHtml(this).children(`.teamsWrap`).children(`.teamWrap`).each(function () {
+        let playoffTeamScore;
+        const playoffTeamName = parsedHtml(this).children(`.nameWrap`).children(`a`).text();
+        const playoffTeamSeed = parsedHtml(this).children(`.nameWrap`).children(`span`).text();
+        playoffTeamScore = parsedHtml(this).children(`div`).last().text();
+        if (playoffTeamName != "") {
+          if (/^[0-9]{3}.*/.test(playoffTeamScore)) {
+            matchupType = "H2H";
+          } else {
+            playoffTeamScore = "N/A"
+          }
+          let teamResult = { playoffTeamName, playoffTeamSeed, playoffTeamScore }
+          teamArr.push(teamResult);
+        }
+      });
+      // Identify Winner based on scores
+      if (teamArr[0]){
+        matchupWinner = teamArr[0].playoffTeamName;
+      }
+      if (teamArr[1]) {
+        if (parseFloat(teamArr[1].playoffTeamScore) > parseFloat(teamArr[0].playoffTeamScore)) {
+          matchupWinner = teamArr[1].playoffTeamName;
+        }
+      }
+      let matchup = { playoffWeek, matchupType, matchupName, matchupWinner, teamArr };
+      returnArr.push(matchup);
+    });
   });
   return returnArr;
 }
@@ -123,6 +166,7 @@ module.exports = {
   getHistoricWeekScores,
   getHistoricFinalStandings,
   getHistoricRegularStandings,
+  getHistoricPlayoffs,
   getweeksInYear,
   getPlayoffWeeks,
   getYearRosterSettings

@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const { getTeamLinks, getLeagueTitle, getCurrentWeekScores, getHistoricWeekScores, getHistoricFinalStandings, getHistoricRegularStandings, getweeksInYear, getPlayoffWeeks, getYearRosterSettings } = require('./cheerio-functions.js');
+const { getTeamLinks, getLeagueTitle, getCurrentWeekScores, getHistoricPlayoffs, getHistoricWeekScores, getHistoricFinalStandings, getHistoricRegularStandings, getweeksInYear, getPlayoffWeeks, getYearRosterSettings } = require('./cheerio-functions.js');
 const utils = require('./utils/utils.js');
 
 // Endpoints
@@ -18,12 +18,12 @@ function yearMetadata(targetUrl, res) {
         axios.get(titleUrl),
         axios.get(playoffUrl),
         axios.get(settingsUrl)]).then(axios.spread((weekRes, titleRes, playoffWeekRes, settingsRes) => {
-            let  returnArr = [];
+            let returnArr = [];
             // Get weeks in year
             const leagueHtmlParsed = cheerio.load(weekRes.data);
             const weekArr = getweeksInYear(leagueHtmlParsed);
             // Get League Title (Why is this so hard?!)
-            const titleHtmlParsed  = cheerio.load(titleRes.data);
+            const titleHtmlParsed = cheerio.load(titleRes.data);
             const leagueTitle = getLeagueTitle(titleHtmlParsed);
             // Get playoff weeks in year
             const playoffHtmlParsed = cheerio.load(playoffWeekRes.data);
@@ -31,7 +31,7 @@ function yearMetadata(targetUrl, res) {
             // Get season roster settings
             const settingsHtmlParsed = cheerio.load(settingsRes.data);
             const rosterArr = getYearRosterSettings(settingsHtmlParsed);
-            returnArr.push({ leagueTitle, weekArr, playoffWeekArr, rosterArr});
+            returnArr.push({ leagueTitle, weekArr, playoffWeekArr, rosterArr });
             res.send(returnArr);
         })).catch(err => console.log(err));
 }
@@ -87,6 +87,16 @@ function historicalWeekListScore(targetUrl, res) {
     }).catch(err => console.log(err));
 }
 
+function historicalYearPlayoffs(targetUrl, res) {
+    console.log(`URL: ${targetUrl}`);
+    axios.get(targetUrl).then(response => {
+        const leagueHtmlParsed = cheerio.load(response.data);
+        let PlayoffsArr = getHistoricPlayoffs(leagueHtmlParsed);
+        utils.logJsonArray(PlayoffsArr);
+        res.send(PlayoffsArr);
+    }).catch(err => console.log(err));
+}
+
 function health(res, port) {
     res.send(`GridIron is UP on port ${port}`);
 }
@@ -98,5 +108,6 @@ module.exports = {
     historicalWeekListScore,
     historicalYearFinalStandings,
     historicalYearRegularStandings,
+    historicalYearPlayoffs,
     health
 }

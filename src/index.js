@@ -2,7 +2,7 @@ const express = require('express');
 
 const { BASE_URL, PORT } = require('../config.js');
 
-const { historicalYearFinalStandings, historicalYearRegularStandings, historicalWeekListScore, currentListTeams, currentWeekListScores, yearMetadata, health } = require('./endpoints.js');
+const { historicalYearFinalStandings, historicalYearRegularStandings, historicalYearPlayoffs, historicalWeekListScore, currentListTeams, currentWeekListScores, yearMetadata, health } = require('./endpoints.js');
 
 // Start express app on defined port
 const app = express();
@@ -43,5 +43,6 @@ app.get(`/api/:league_id/:year/metadata`, (req, res) => {
 });
 
 app.get(`/api/:league_id/:year/playoffs`, (req, res) => {
-  const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/playoffs";
+  const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/playoffs?bracketType=championship&standingsTab=playoffs";
+  historicalYearPlayoffs(targetUrl, res);
 });

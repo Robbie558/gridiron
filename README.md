@@ -59,8 +59,9 @@ All results returned wil be JSON formatted.
 
 ## Roadmap
 
-* Final Year End Standings - https://fantasy.nfl.com/league/2285751/history/2020/standings
-* Regular Season Year End Standings - https://fantasy.nfl.com/league/2285751/history/2021/standings?historyStandingsType=regular
+* Top / Bottom 10 performances of year - ???
 * Toilet Bowl - https://fantasy.nfl.com/league/2285751/history/2020/playoffs?bracketType=consolation&standingsTab=playoffs
 * Champ Bowl - https://fantasy.nfl.com/league/2285751/history/2020/playoffs?bracketType=championship&standingsTab=playoffs
 * Bench Points per historic week - https://fantasy.nfl.com/league/2285751/history/2020/teamhome?statCategory=stats&statSeason=2020&statType=weekStats&statWeek=1&teamId=11&week=1
+* Historical Week Standings - ???
+* Undrafted Player Top 10 per week - ???
