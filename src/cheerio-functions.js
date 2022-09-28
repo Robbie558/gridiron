@@ -129,12 +129,11 @@ function getHistoricPlayoffs(parsedHtml) {
       //Teams
       let teamArr = [];
       parsedHtml(this).children(`.teamsWrap`).children(`.teamWrap`).each(function () {
-        let playoffTeamScore;
         const playoffTeamName = parsedHtml(this).children(`.nameWrap`).children(`a`).text();
         const playoffTeamSeed = parsedHtml(this).children(`.nameWrap`).children(`span`).text();
-        playoffTeamScore = parsedHtml(this).children(`div`).last().text();
+        let playoffTeamScore = parsedHtml(this).children(`div`).last().text();
         if (playoffTeamName != "") {
-          if (/^[0-9]{3}.*/.test(playoffTeamScore)) {
+          if (/^[0-9]{2}.*/.test(playoffTeamScore)) {
             matchupType = "H2H";
           } else {
             playoffTeamScore = "N/A"
@@ -153,7 +152,9 @@ function getHistoricPlayoffs(parsedHtml) {
         }
       }
       let matchup = { playoffWeek, matchupType, matchupName, matchupWinner, teamArr };
-      returnArr.push(matchup);
+      if(teamArr.length != 0){
+        returnArr.push(matchup);
+      }
     });
   });
   return returnArr;
