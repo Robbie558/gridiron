@@ -122,6 +122,7 @@ function getHistoricPlayoffs(parsedHtml) {
   parsedHtml(`.playoffContent`).children().each(function () {
     //Matchup
     let playoffWeek = parsedHtml(this).children(`h4`).text();
+    let matchupArr = [];
     parsedHtml(this).children(`ul`).children(`li`).each(function () {
       const matchupName = parsedHtml(this).children(`h5`).text();
       let matchupType = "Bye";
@@ -151,11 +152,12 @@ function getHistoricPlayoffs(parsedHtml) {
           matchupWinner = teamArr[1].playoffTeamName;
         }
       }
-      let matchup = { playoffWeek, matchupType, matchupName, matchupWinner, teamArr };
+      let matchup = { matchupType, matchupName, matchupWinner, teamArr };
       if(teamArr.length != 0){
-        returnArr.push(matchup);
+        matchupArr.push(matchup);
       }
     });
+    returnArr.push({playoffWeek, matchupArr});
   });
   return returnArr;
 }
