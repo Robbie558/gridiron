@@ -26,8 +26,8 @@ app.get(`/api/:league_id/:year/scores/:week`, (req, res) => {
   historicalWeekListScore(targetUrl, res);
 });
 
-app.get(`/api/:league_id/:year/standings/:standingType`, (req, res) => {
-  if (req.params.standingType == "final") {
+app.get(`/api/:league_id/:year/standings/:standing_type`, (req, res) => {
+  if (req.params.standing_type == "final") {
     const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/standings?historyStandingsType=final";
     historicalYearFinalStandings(targetUrl, res);
   }
@@ -42,7 +42,12 @@ app.get(`/api/:league_id/:year/metadata`, (req, res) => {
   yearMetadata(targetUrl, res);
 });
 
-app.get(`/api/:league_id/:year/playoffs`, (req, res) => {
-  const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/playoffs?bracketType=championship&standingsTab=playoffs";
-  historicalYearPlayoffs(targetUrl, res);
+app.get(`/api/:league_id/:year/playoffs/:playoff_bracket`, (req, res) => {
+  if (req.params.playoff_bracket == "championship") {
+    const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/playoffs?bracketType=championship&standingsTab=playoffs";
+    historicalYearPlayoffs(targetUrl, res);
+  } else {
+    const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/playoffs?bracketType=consolation&standingsTab=playoffs";
+    historicalYearPlayoffs(targetUrl, res);
+  }
 });
