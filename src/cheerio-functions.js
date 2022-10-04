@@ -55,6 +55,25 @@ function getHistoricWeekScores(parsedHtml) {
   return returnArr;
 }
 
+function getHistoricTeamBenchTotalPoints(parsedHtml) {
+  let returnArr = [];
+  let rosteredPlayerName;
+  let rosteredPlayerWeekScore;
+  let teamBenchTotal = 0;
+  let teamName = parsedHtml(`.selecter-selected`).children(`.label`).text();
+  let teamOwner = parsedHtml(`.owners`).children(`li`).children(`a`).text();
+  parsedHtml('.tableType-player').children(`tbody`).children(`tr`).each(function () {
+    rosteredPlayerPosition = parsedHtml(this).children(`.teamPosition`).children(`.final`).text();
+    rosteredPlayerName = parsedHtml(this).children(`.playerNameAndInfo`).children(`div`).children(`a`).text();
+    rosteredPlayerWeekScore = parsedHtml(this).children(`.stat`).children(`.playerTotal`).text();
+    if (/^BN/.test(rosteredPlayerPosition)) {
+      teamBenchTotal += parseFloat(rosteredPlayerWeekScore);
+    }
+  });
+  returnArr.push({teamName, teamOwner, teamBenchTotal})
+  return returnArr;
+}
+
 function getweeksInYear(parsedHtml) {
   let returnArr = [];
   const weekList = parsedHtml(`.scheduleWeekNav`).children().children();
@@ -75,14 +94,23 @@ function getPlayoffWeeks(parsedHtml) {
   return returnArr;
 }
 
+function getYearLeagueSettings(parsedHtml) {
+  let leagueTeamCount = 0;
+  parsedHtml(`.settingsContent`).children(`ul`).children(`li`).each(function () {
+    if (/^Teams.*/.test(parsedHtml(this).text()) ) {
+      leagueTeamCount = parsedHtml(this).children(`div`).text();
+    }
+  });
+  console.log(`Teams in League: ${leagueTeamCount}`);
+  return {leagueTeamCount};
+}
+
 function getYearRosterSettings(parsedHtml) {
   let returnArr = [];
-  const rosterList = parsedHtml(`.positionsAndRoster`).children(`li`);
-  rosterList.each(function () {
+  parsedHtml(`.positionsAndRoster`).children(`li`).each(function () {
     const rosterPostion = parsedHtml(this).children(`em`).html();
     const rosterLimit = parsedHtml(this).children(`.value`).html();
-    let roster = { rosterPostion, rosterLimit }
-    returnArr.push(roster)
+    returnArr.push({ rosterPostion, rosterLimit })
   });
   return returnArr;
 }
@@ -169,8 +197,10 @@ module.exports = {
   getHistoricWeekScores,
   getHistoricFinalStandings,
   getHistoricRegularStandings,
+  getHistoricTeamBenchTotalPoints,
   getHistoricPlayoffs,
   getweeksInYear,
   getPlayoffWeeks,
-  getYearRosterSettings
+  getYearRosterSettings,
+  getYearLeagueSettings
 }
