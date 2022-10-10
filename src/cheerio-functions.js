@@ -55,7 +55,7 @@ function getHistoricWeekScores(parsedHtml) {
   return returnArr;
 }
 
-function getHistoricTeamBenchTotalPoints(parsedHtml) {
+function getHistoricTeamWeekBenchTotalPoints(parsedHtml) {
   let returnArr = [];
   let rosteredPlayerName;
   let rosteredPlayerWeekScore;
@@ -101,7 +101,6 @@ function getYearLeagueSettings(parsedHtml) {
       leagueTeamCount = parsedHtml(this).children(`div`).text();
     }
   });
-  console.log(`Teams in League: ${leagueTeamCount}`);
   return {leagueTeamCount};
 }
 
@@ -197,7 +196,7 @@ module.exports = {
   getHistoricWeekScores,
   getHistoricFinalStandings,
   getHistoricRegularStandings,
-  getHistoricTeamBenchTotalPoints,
+  getHistoricTeamWeekBenchTotalPoints,
   getHistoricPlayoffs,
   getweeksInYear,
   getPlayoffWeeks,
