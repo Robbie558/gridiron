@@ -70,7 +70,7 @@ function historicalYearTeamBenchScore(metadataUrl, targetUrl, res) {
         weekUrlArr.push(weekUrl);
     }
     // Cycle through Week URLs
-    Promise.all(weekUrlArr.map(fetchCheerioData)).then(allResponse => {
+    Promise.all(weekUrlArr.map(fetchRawCheerioData)).then(allResponse => {
         allResponse.forEach((weekObj, weekIndex) => {
             let weekBenchScore = getHistoricTeamWeekBenchTotalPoints(weekObj[`data`]);
             benchTotal += parseFloat(weekBenchScore[0][`teamBenchTotal`]);
