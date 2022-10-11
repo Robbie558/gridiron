@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const { getTeamLinks, getLeagueTitle, getCurrentWeekScores, getHistoricPlayoffs, getHistoricWeekScores, getHistoricFinalStandings, getHistoricTeamWeekBenchTotalPoints, getHistoricRegularStandings, getweeksInYear, getPlayoffWeeks, getYearRosterSettings, getYearLeagueSettings } = require('./cheerio-functions.js');
+const { getLeagueTitle, getHistoricTeamWeekBenchTotalPoints, getweeksInYear, getPlayoffWeeks, getYearRosterSettings, getYearLeagueSettings } = require('./cheerio-functions.js');
 const utils = require('./utils/utils.js');
 
 // Endpoints
@@ -37,76 +37,29 @@ function yearMetadata(targetUrl, res) {
         })).catch(err => console.log(err));
 }
 
-function historicalYearFinalStandings(targetUrl, res) {
-    console.log(`URL: ${targetUrl}`);
-    axios.get(targetUrl).then(response => {
+function fetchRawCheerioData(targetUrl, ) {
+    return axios.get(targetUrl).then(response => {
         const leagueHtmlParsed = cheerio.load(response.data);
-        let leagueStandingsArr = getHistoricFinalStandings(leagueHtmlParsed);
-        utils.logJsonArray(leagueStandingsArr);
-        res.send(leagueStandingsArr);
-    }).catch(err => console.log(err));
+        return { target: targetUrl, success: true, data: leagueHtmlParsed };
+    }).catch(function (error) {
+        return { success: false, message: error };
+    });
 }
 
-function historicalYearRegularStandings(targetUrl, res) {
-    console.log(`URL: ${targetUrl}`);
-    axios.get(targetUrl).then(response => {
-        const leagueHtmlParsed = cheerio.load(response.data);
-        let leagueStandingsArr = getHistoricRegularStandings(leagueHtmlParsed);
-        utils.logJsonArray(leagueStandingsArr);
-        res.send(leagueStandingsArr);
-    }).catch(err => console.log(err));
-}
-
-function currentListTeams(targetUrl, res) {
-    console.log(`URL: ${targetUrl}`);
-    axios.get(targetUrl).then(response => {
-        const leagueHtmlParsed = cheerio.load(response.data);
-        let teamLinkArr = getTeamLinks(leagueHtmlParsed);
-        utils.logJsonArray(teamLinkArr);
-        res.send(teamLinkArr);
-    }).catch(err => console.log(err));
-}
-
-function currentWeekListScores(targetUrl, res) {
-    console.log(`URL: ${targetUrl}`);
-    axios.get(targetUrl).then(response => {
-        const leagueHtmlParsed = cheerio.load(response.data);
-        let scoresArr = getCurrentWeekScores(leagueHtmlParsed);
-        utils.logJsonArray(scoresArr);
-        res.send(scoresArr);
-    }).catch(err => console.log(err));
-}
-
-
-function historicalWeekListScore(targetUrl, res) {
-    console.log(`URL: ${targetUrl}`);
-    axios.get(targetUrl).then(response => {
-        const leagueHtmlParsed = cheerio.load(response.data);
-        let scoresArr = getHistoricWeekScores(leagueHtmlParsed);
-        utils.logJsonArray(scoresArr);
-        res.send(scoresArr);
-    }).catch(err => console.log(err));
-}
-
-function historicalYearPlayoffs(targetUrl, res) {
-    console.log(`URL: ${targetUrl}`);
-    axios.get(targetUrl).then(response => {
-        const leagueHtmlParsed = cheerio.load(response.data);
-        let PlayoffsArr = getHistoricPlayoffs(leagueHtmlParsed);
-        utils.logJsonArray(PlayoffsArr);
-        res.send(PlayoffsArr);
-    }).catch(err => console.log(err));
-}
-
-function fetchCheerioData(URL) {
-    return axios.get(URL).then(response => {
-        const leagueHtmlParsed = cheerio.load(response.data);
-        return { target: URL, success: true, data: leagueHtmlParsed };
-    }).catch(err => console.log(err));
+function fetchProccessedCheerioData(targetUrl, cheerioFunction, res) {
+    return axios.get(targetUrl).then(response => {
+        const cheerioDataObj = cheerio.load(response.data);
+        let returnObj = cheerioFunction(cheerioDataObj);
+        utils.logJsonArray(returnObj);
+        res.send(returnObj);
+    }).catch(function (error) {
+        return { success: false, message: error };
+    });
 }
 
 function historicalYearTeamBenchScore(metadataUrl, targetUrl, res) {
     const weekUrlArr = [];
+
     let benchTotal = 0, benchHighScore = 0;
     let teamName, teamOwner;
     //TODO Use metadata to set length of season
@@ -128,22 +81,12 @@ function historicalYearTeamBenchScore(metadataUrl, targetUrl, res) {
             teamName = weekBenchScore[0][`teamName`];
             teamOwner = weekBenchScore[0][`teamOwner`];
         });
-        const responseObj = { teamName, teamOwner, benchTotal, highBench: { benchHighScore, benchHighWeek } }
-        utils.logJsonArray(responseObj);
-        res.send(responseObj);
+        const returnObj = { teamName, teamOwner, benchTotal, highBench: { benchHighScore, benchHighWeek } }
+        utils.logJsonArray(returnObj);
+        res.send(returnObj);
     }).catch(function (error) {
         return { success: false, message: error };
     });
-}
-
-function historicalWeekTeamBenchScore(targetUrl, res) {
-    console.log(`URL: ${targetUrl}`);
-    axios.get(targetUrl).then(response => {
-        const leagueHtmlParsed = cheerio.load(response.data);
-        let scoresArr = getHistoricTeamWeekBenchTotalPoints(leagueHtmlParsed);
-        utils.logJsonArray(scoresArr);
-        res.send(scoresArr);
-    }).catch(err => console.log(err));
 }
 
 function health(res, port) {
@@ -151,14 +94,8 @@ function health(res, port) {
 }
 
 module.exports = {
-    historicalWeekTeamBenchScore,
+    health,
     historicalYearTeamBenchScore,
     yearMetadata,
-    currentListTeams,
-    currentWeekListScores,
-    historicalWeekListScore,
-    historicalYearFinalStandings,
-    historicalYearRegularStandings,
-    historicalYearPlayoffs,
-    health
+    fetchProccessedCheerioData
 }
