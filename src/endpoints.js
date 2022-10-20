@@ -37,7 +37,7 @@ function yearMetadata(targetUrl, res) {
         })).catch(err => console.log(err));
 }
 
-function fetchRawCheerioData(targetUrl, ) {
+function fetchRawCheerioData(targetUrl) {
     return axios.get(targetUrl).then(response => {
         const leagueHtmlParsed = cheerio.load(response.data);
         return { target: targetUrl, success: true, data: leagueHtmlParsed };
@@ -57,13 +57,10 @@ function fetchProccessedCheerioData(targetUrl, cheerioFunction, res) {
     });
 }
 
-function historicalYearTeamBenchScore(metadataUrl, targetUrl, res) {
+function historicalYearTeamBenchScore(seasonLength, targetUrl, res) {
     const weekUrlArr = [];
-
     let benchTotal = 0, benchHighScore = 0;
     let teamName, teamOwner;
-    //TODO Use metadata to set length of season
-    const seasonLength = 17;
     // Build Weekly URL
     for (let i = 1; i <= seasonLength; i++) {
         let weekUrl = targetUrl.replace(/week=N/g, `week=${i}`);
