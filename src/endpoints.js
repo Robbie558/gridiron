@@ -21,8 +21,8 @@ function yearMetadata(targetUrl, res) {
         axios.get(settingsUrl)]).then(axios.spread((weekRes, titleRes, playoffWeekRes, settingsRes) => {
             let returnArr = [];
             // Get weeks in year
-            const leagueHtmlParsed = cheerio.load(weekRes.data);
-            const weekArr = getweeksInYear(leagueHtmlParsed);
+            const weeksHtmlParsed = cheerio.load(weekRes.data);
+            const seasonLength = getweeksInYear(weeksHtmlParsed);
             // Get League Title (Why is this so hard?!)
             const titleHtmlParsed = cheerio.load(titleRes.data);
             const leagueTitle = getLeagueTitle(titleHtmlParsed);
@@ -32,8 +32,9 @@ function yearMetadata(targetUrl, res) {
             // Get season roster settings
             const settingsHtmlParsed = cheerio.load(settingsRes.data);
             const rosterArr = getYearRosterSettings(settingsHtmlParsed);
-            const leagueSettings = getYearLeagueSettings(settingsHtmlParsed);
-            res.send({ leagueTitle, leagueSettings, weekArr, playoffWeekArr, rosterArr });
+            let leagueConfig = getYearLeagueSettings(settingsHtmlParsed);
+            leagueConfig = { ...leagueConfig, ...{seasonLength} };
+            res.send({ leagueTitle, leagueConfig, playoffWeekArr, rosterArr });
         })).catch(err => console.log(err));
 }
 
@@ -57,30 +58,36 @@ function fetchProccessedCheerioData(targetUrl, cheerioFunction, res) {
     });
 }
 
-function historicalYearTeamBenchScore(seasonLength, targetUrl, res) {
+function historicalYearTeamBenchScore(seasonLengthUrl, targetUrl, res) {
     const weekUrlArr = [];
     let benchTotal = 0, benchHighScore = 0;
     let teamName, teamOwner;
-    // Build Weekly URL
-    for (let i = 1; i <= seasonLength; i++) {
-        let weekUrl = targetUrl.replace(/week=N/g, `week=${i}`);
-        weekUrlArr.push(weekUrl);
-    }
-    // Cycle through Week URLs
-    Promise.all(weekUrlArr.map(fetchRawCheerioData)).then(allResponse => {
-        allResponse.forEach((weekObj, weekIndex) => {
-            let weekBenchScore = getHistoricTeamWeekBenchTotalPoints(weekObj[`data`]);
-            benchTotal += parseFloat(weekBenchScore[0][`teamBenchTotal`]);
-            if (weekBenchScore[0][`teamBenchTotal`] >= benchHighScore) {
-                benchHighScore = weekBenchScore[0][`teamBenchTotal`];
-                benchHighWeek = weekIndex;
-            }
-            teamName = weekBenchScore[0][`teamName`];
-            teamOwner = weekBenchScore[0][`teamOwner`];
+    // Build Weekly Score URLs
+    axios.get(seasonLengthUrl).then(seasonLengthResponse => {
+        const seasonLengthParsed = cheerio.load(seasonLengthResponse.data);
+        const seasonLength = getweeksInYear(seasonLengthParsed);
+        for (let i = 1; i <= seasonLength; i++) {
+            let weekUrl = targetUrl.replace(/week=N/g, `week=${i}`);
+            weekUrlArr.push(weekUrl);
+        }
+        // Cycle through Week URLs
+        Promise.all(weekUrlArr.map(fetchRawCheerioData)).then(allResponse => {
+            allResponse.forEach((weekObj, weekIndex) => {
+                let weekBenchScore = getHistoricTeamWeekBenchTotalPoints(weekObj[`data`]);
+                benchTotal += parseFloat(weekBenchScore[0][`teamBenchTotal`]);
+                if (weekBenchScore[0][`teamBenchTotal`] >= benchHighScore) {
+                    benchHighScore = weekBenchScore[0][`teamBenchTotal`];
+                    benchHighWeek = weekIndex;
+                }
+                teamName = weekBenchScore[0][`teamName`];
+                teamOwner = weekBenchScore[0][`teamOwner`];
+            });
+            const returnObj = { teamName, teamOwner, benchTotal, highBench: { benchHighScore, benchHighWeek } }
+            utils.logJsonArray(returnObj);
+            res.send(returnObj);
+        }).catch(function (error) {
+            return { success: false, message: error };
         });
-        const returnObj = { teamName, teamOwner, benchTotal, highBench: { benchHighScore, benchHighWeek } }
-        utils.logJsonArray(returnObj);
-        res.send(returnObj);
     }).catch(function (error) {
         return { success: false, message: error };
     });

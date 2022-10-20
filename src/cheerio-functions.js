@@ -70,19 +70,19 @@ function getHistoricTeamWeekBenchTotalPoints(parsedHtml) {
       teamBenchTotal += parseFloat(rosteredPlayerWeekScore);
     }
   });
-  returnArr.push({teamName, teamOwner, teamBenchTotal})
+  returnArr.push({ teamName, teamOwner, teamBenchTotal })
   return returnArr;
 }
 
 function getweeksInYear(parsedHtml) {
-  let returnArr = [];
+  let weekArr = [];
   const weekList = parsedHtml(`.scheduleWeekNav`).children().children();
   weekList.each(function () {
     if (parsedHtml(this).children('.title').html() != null) {
-      returnArr.push(parsedHtml(this).children('.title').text());
+      weekArr.push(parsedHtml(this).children('.title').text());
     }
   });
-  return returnArr;
+  return weekArr.length;
 }
 
 function getPlayoffWeeks(parsedHtml) {
@@ -95,13 +95,23 @@ function getPlayoffWeeks(parsedHtml) {
 }
 
 function getYearLeagueSettings(parsedHtml) {
-  let leagueTeamCount = 0;
-  parsedHtml(`.settingsContent`).children(`ul`).children(`li`).each(function () {
-    if (/^Teams.*/.test(parsedHtml(this).text()) ) {
-      leagueTeamCount = parsedHtml(this).children(`div`).text();
+  let teamCount, commissioner, draftFormat, draftType;
+  parsedHtml(`.formItems`).children(`li`).each(function () {
+    if (/^Commissioner.*/.test(parsedHtml(this).text())) {
+      commissioner = parsedHtml(this).children(`div`).text();
+    }
+    if (/^Draft Type.*/.test(parsedHtml(this).text())) {
+      draftType = parsedHtml(this).children(`div`).text();
+    }
+    if (/^Draft Format.*/.test(parsedHtml(this).text())) {
+      draftFormat = parsedHtml(this).children(`div`).text();
+    }
+    if (/^Teams.*/.test(parsedHtml(this).text())) {
+      teamCount = parsedHtml(this).children(`div`).text();
     }
   });
-  return {leagueTeamCount};
+  console.log(draftFormat);
+  return { teamCount, commissioner, draftFormat, draftType };
 }
 
 function getYearRosterSettings(parsedHtml) {
@@ -171,7 +181,7 @@ function getHistoricPlayoffs(parsedHtml) {
         }
       });
       // Identify Winner based on scores
-      if (teamArr[0]){
+      if (teamArr[0]) {
         matchupWinner = teamArr[0].playoffTeamName;
       }
       if (teamArr[1]) {
@@ -180,11 +190,11 @@ function getHistoricPlayoffs(parsedHtml) {
         }
       }
       let matchup = { matchupType, matchupName, matchupWinner, teamArr };
-      if(teamArr.length != 0){
+      if (teamArr.length != 0) {
         matchupArr.push(matchup);
       }
     });
-    returnArr.push({playoffWeek, matchupArr});
+    returnArr.push({ playoffWeek, matchupArr });
   });
   return returnArr;
 }
