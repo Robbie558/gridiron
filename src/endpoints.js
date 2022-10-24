@@ -1,10 +1,34 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const { getLeagueTitle, getHistoricTeamWeekBenchTotalPoints, getweeksInYear, getPlayoffWeeks, getYearRosterSettings, getYearLeagueSettings } = require('./cheerio-functions.js');
+const { getLeagueTitle, getHistoricWeekTeamPoints, getweeksInYear, getPlayoffWeeks, getYearRosterSettings, getYearLeagueSettings } = require('./cheerio-functions.js');
 const utils = require('./utils/utils.js');
 
 // Endpoints
+function fetchRawCheerioData(targetUrl) {
+    return axios.get(targetUrl).then(response => {
+        const leagueHtmlParsed = cheerio.load(response.data);
+        return { target: targetUrl, success: true, data: leagueHtmlParsed };
+    }).catch(function (error) {
+        return { success: false, message: error };
+    });
+}
+
+function fetchProccessedCheerioData(targetUrl, cheerioFunction, res) {
+    return axios.get(targetUrl).then(response => {
+        const cheerioDataObj = cheerio.load(response.data);
+        let returnObj = cheerioFunction(cheerioDataObj);
+        utils.logJsonArray(returnObj);
+        res.send(returnObj);
+    }).catch(function (error) {
+        return { success: false, message: error };
+    });
+}
+
+function health(res, port) {
+    res.send(`GridIron is UP on port ${port}`);
+}
+
 function yearMetadata(targetUrl, res) {
     const weekUrl = targetUrl;
     console.log(`Week Count URL: ${weekUrl}`);
@@ -38,26 +62,6 @@ function yearMetadata(targetUrl, res) {
         })).catch(err => console.log(err));
 }
 
-function fetchRawCheerioData(targetUrl) {
-    return axios.get(targetUrl).then(response => {
-        const leagueHtmlParsed = cheerio.load(response.data);
-        return { target: targetUrl, success: true, data: leagueHtmlParsed };
-    }).catch(function (error) {
-        return { success: false, message: error };
-    });
-}
-
-function fetchProccessedCheerioData(targetUrl, cheerioFunction, res) {
-    return axios.get(targetUrl).then(response => {
-        const cheerioDataObj = cheerio.load(response.data);
-        let returnObj = cheerioFunction(cheerioDataObj);
-        utils.logJsonArray(returnObj);
-        res.send(returnObj);
-    }).catch(function (error) {
-        return { success: false, message: error };
-    });
-}
-
 function historicalYearTeamBenchScore(seasonLengthUrl, targetUrl, res) {
     const weekUrlArr = [];
     let benchTotal = 0, benchHighScore = 0;
@@ -73,7 +77,7 @@ function historicalYearTeamBenchScore(seasonLengthUrl, targetUrl, res) {
         // Cycle through Week URLs
         Promise.all(weekUrlArr.map(fetchRawCheerioData)).then(allResponse => {
             allResponse.forEach((weekObj, weekIndex) => {
-                let weekBenchScore = getHistoricTeamWeekBenchTotalPoints(weekObj[`data`]);
+                let weekBenchScore = getHistoricWeekTeamPoints(weekObj[`data`]);
                 benchTotal += parseFloat(weekBenchScore[0][`teamBenchTotal`]);
                 if (weekBenchScore[0][`teamBenchTotal`] >= benchHighScore) {
                     benchHighScore = weekBenchScore[0][`teamBenchTotal`];
@@ -93,13 +97,10 @@ function historicalYearTeamBenchScore(seasonLengthUrl, targetUrl, res) {
     });
 }
 
-function health(res, port) {
-    res.send(`GridIron is UP on port ${port}`);
-}
-
 module.exports = {
+    fetchRawCheerioData,
+    fetchProccessedCheerioData,
     health,
-    historicalYearTeamBenchScore,
     yearMetadata,
-    fetchProccessedCheerioData
+    historicalYearTeamBenchScore
 }

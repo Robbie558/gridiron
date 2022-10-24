@@ -55,11 +55,12 @@ function getHistoricWeekScores(parsedHtml) {
   return returnArr;
 }
 
-function getHistoricTeamWeekBenchTotalPoints(parsedHtml) {
+function getHistoricWeekTeamPoints(parsedHtml) {
   let returnArr = [];
   let rosteredPlayerName;
   let rosteredPlayerWeekScore;
-  let teamBenchTotal = 0;
+  let teamActiveTotal = 0, teamBenchTotal = 0;
+  let teamQbTotal = 0, teamRbTotal = 0 , teamWrTotal = 0, teamTeTotal = 0, teamKiTotal = 0, teamDeTotal = 0;
   let teamName = parsedHtml(`.selecter-selected`).children(`.label`).text();
   let teamOwner = parsedHtml(`.owners`).children(`li`).children(`a`).text();
   parsedHtml('.tableType-player').children(`tbody`).children(`tr`).each(function () {
@@ -67,10 +68,19 @@ function getHistoricTeamWeekBenchTotalPoints(parsedHtml) {
     rosteredPlayerName = parsedHtml(this).children(`.playerNameAndInfo`).children(`div`).children(`a`).text();
     rosteredPlayerWeekScore = parsedHtml(this).children(`.stat`).children(`.playerTotal`).text();
     if (/^BN/.test(rosteredPlayerPosition)) {
-      teamBenchTotal += parseFloat(rosteredPlayerWeekScore);
+      teamBenchTotal += parseFloat(rosteredPlayerWeekScore);  
+    } else {
+      if (rosteredPlayerWeekScore) teamActiveTotal += parseFloat(rosteredPlayerWeekScore);
+      const playerPositionTeam = parsedHtml(this).children(`.playerNameAndInfo`).children().children(`em`).text();
+      if (/^QB/.test(playerPositionTeam))       teamQbTotal += parseFloat(rosteredPlayerWeekScore);
+      else if (/^RB/.test(playerPositionTeam))  teamRbTotal += parseFloat(rosteredPlayerWeekScore);
+      else if (/^WR/.test(playerPositionTeam))  teamWrTotal += parseFloat(rosteredPlayerWeekScore);
+      else if (/^TE/.test(playerPositionTeam))  teamTeTotal += parseFloat(rosteredPlayerWeekScore);
+      else if (/^K/.test(playerPositionTeam))   teamKiTotal += parseFloat(rosteredPlayerWeekScore);
+      else if (/^DEF/.test(playerPositionTeam)) teamDeTotal += parseFloat(rosteredPlayerWeekScore);
     }
   });
-  returnArr.push({ teamName, teamOwner, teamBenchTotal })
+  returnArr.push({ teamName, teamOwner, teamBenchTotal, teamActiveTotal, rosterPostiionScores:{teamQbTotal, teamRbTotal, teamWrTotal, teamTeTotal, teamKiTotal, teamDeTotal} })
   return returnArr;
 }
 
@@ -206,7 +216,7 @@ module.exports = {
   getHistoricWeekScores,
   getHistoricFinalStandings,
   getHistoricRegularStandings,
-  getHistoricTeamWeekBenchTotalPoints,
+  getHistoricWeekTeamPoints,
   getHistoricPlayoffs,
   getweeksInYear,
   getPlayoffWeeks,
