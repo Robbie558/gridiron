@@ -55,33 +55,37 @@ function getHistoricWeekScores(parsedHtml) {
   return returnArr;
 }
 
-function getHistoricWeekTeamPoints(parsedHtml) {
-  let returnArr = [];
+function getHistoricWeekTeamAnalysis(parsedHtml) {
   let rosteredPlayerName;
   let rosteredPlayerWeekScore;
   let teamActiveTotal = 0, teamBenchTotal = 0;
   let teamQbTotal = 0, teamRbTotal = 0 , teamWrTotal = 0, teamTeTotal = 0, teamKiTotal = 0, teamDeTotal = 0;
+  let teamPlayerHighScore = 0;
   let teamName = parsedHtml(`.selecter-selected`).children(`.label`).text();
-  let teamOwner = parsedHtml(`.owners`).children(`li`).children(`a`).text();
+  let teamOwner = parsedHtml(`.owners`).children(`li`).children().text();
   parsedHtml('.tableType-player').children(`tbody`).children(`tr`).each(function () {
     rosteredPlayerPosition = parsedHtml(this).children(`.teamPosition`).children(`.final`).text();
     rosteredPlayerName = parsedHtml(this).children(`.playerNameAndInfo`).children(`div`).children(`a`).text();
-    rosteredPlayerWeekScore = parsedHtml(this).children(`.stat`).children(`.playerTotal`).text();
+    rosteredPlayerWeekScore = parseFloat(parsedHtml(this).children(`.stat`).children(`.playerTotal`).text());
     if (/^BN/.test(rosteredPlayerPosition)) {
-      teamBenchTotal += parseFloat(rosteredPlayerWeekScore);  
+      teamBenchTotal += rosteredPlayerWeekScore;  
     } else {
-      if (rosteredPlayerWeekScore) teamActiveTotal += parseFloat(rosteredPlayerWeekScore);
+      if (rosteredPlayerWeekScore) teamActiveTotal += rosteredPlayerWeekScore;
       const playerPositionTeam = parsedHtml(this).children(`.playerNameAndInfo`).children().children(`em`).text();
-      if (/^QB/.test(playerPositionTeam))       teamQbTotal += parseFloat(rosteredPlayerWeekScore);
-      else if (/^RB/.test(playerPositionTeam))  teamRbTotal += parseFloat(rosteredPlayerWeekScore);
-      else if (/^WR/.test(playerPositionTeam))  teamWrTotal += parseFloat(rosteredPlayerWeekScore);
-      else if (/^TE/.test(playerPositionTeam))  teamTeTotal += parseFloat(rosteredPlayerWeekScore);
-      else if (/^K/.test(playerPositionTeam))   teamKiTotal += parseFloat(rosteredPlayerWeekScore);
-      else if (/^DEF/.test(playerPositionTeam)) teamDeTotal += parseFloat(rosteredPlayerWeekScore);
+      if (/^QB/.test(playerPositionTeam))       teamQbTotal += rosteredPlayerWeekScore;
+      else if (/^RB/.test(playerPositionTeam))  teamRbTotal += rosteredPlayerWeekScore;
+      else if (/^WR/.test(playerPositionTeam))  teamWrTotal += rosteredPlayerWeekScore;
+      else if (/^TE/.test(playerPositionTeam))  teamTeTotal += rosteredPlayerWeekScore;
+      else if (/^K/.test(playerPositionTeam))   teamKiTotal += rosteredPlayerWeekScore;
+      else if (/^DEF/.test(playerPositionTeam)) teamDeTotal += rosteredPlayerWeekScore;
+      if (rosteredPlayerWeekScore > teamPlayerHighScore ){
+        teamPlayerHighScore = rosteredPlayerWeekScore;
+        teamPlayerName = rosteredPlayerName;
+      }
     }
   });
-  returnArr.push({ teamName, teamOwner, teamBenchTotal, teamActiveTotal, rosterPostiionScores:{teamQbTotal, teamRbTotal, teamWrTotal, teamTeTotal, teamKiTotal, teamDeTotal} })
-  return returnArr;
+  const returnObj = { teamName, teamOwner, teamBenchTotal, teamActiveTotal, rosterHighScore:{teamPlayerName, teamPlayerHighScore}, rosterPostiionScores:{teamQbTotal, teamRbTotal, teamWrTotal, teamTeTotal, teamKiTotal, teamDeTotal} };
+  return returnObj;
 }
 
 function getweeksInYear(parsedHtml) {
@@ -216,7 +220,7 @@ module.exports = {
   getHistoricWeekScores,
   getHistoricFinalStandings,
   getHistoricRegularStandings,
-  getHistoricWeekTeamPoints,
+  getHistoricWeekTeamAnalysis,
   getHistoricPlayoffs,
   getweeksInYear,
   getPlayoffWeeks,

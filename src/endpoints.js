@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const { getLeagueTitle, getHistoricWeekTeamPoints, getweeksInYear, getPlayoffWeeks, getYearRosterSettings, getYearLeagueSettings } = require('./cheerio-functions.js');
+const { getLeagueTitle, getHistoricWeekTeamAnalysis, getweeksInYear, getPlayoffWeeks, getYearRosterSettings, getYearLeagueSettings } = require('./cheerio-functions.js');
 const utils = require('./utils/utils.js');
 
 // Endpoints
@@ -14,7 +14,7 @@ function fetchRawCheerioData(targetUrl) {
     });
 }
 
-function fetchProccessedCheerioData(targetUrl, cheerioFunction, res) {
+function returnProcessedUrl(targetUrl, cheerioFunction, res) {
     return axios.get(targetUrl).then(response => {
         const cheerioDataObj = cheerio.load(response.data);
         let returnObj = cheerioFunction(cheerioDataObj);
@@ -62,9 +62,10 @@ function yearMetadata(targetUrl, res) {
         })).catch(err => console.log(err));
 }
 
-function historicalYearTeamBenchScore(seasonLengthUrl, targetUrl, res) {
-    const weekUrlArr = [];
+function getHistoricYearTeamAnalysis(seasonLengthUrl, targetUrl, res) {
+    const weekUrlArr = []; 
     let benchTotal = 0, benchHighScore = 0;
+    let activeTotal = 0, activeHighScore = 0;
     let teamName, teamOwner;
     // Build Weekly Score URLs
     axios.get(seasonLengthUrl).then(seasonLengthResponse => {
@@ -74,19 +75,24 @@ function historicalYearTeamBenchScore(seasonLengthUrl, targetUrl, res) {
             let weekUrl = targetUrl.replace(/week=N/g, `week=${i}`);
             weekUrlArr.push(weekUrl);
         }
-        // Cycle through Week URLs
+        // Cycle through Week URLs Array and process response
         Promise.all(weekUrlArr.map(fetchRawCheerioData)).then(allResponse => {
             allResponse.forEach((weekObj, weekIndex) => {
-                let weekBenchScore = getHistoricWeekTeamPoints(weekObj[`data`]);
-                benchTotal += parseFloat(weekBenchScore[0][`teamBenchTotal`]);
-                if (weekBenchScore[0][`teamBenchTotal`] >= benchHighScore) {
-                    benchHighScore = weekBenchScore[0][`teamBenchTotal`];
+                let historicWeekAnalysis = getHistoricWeekTeamAnalysis(weekObj[`data`]);
+                teamName = historicWeekAnalysis[`teamName`];
+                teamOwner = historicWeekAnalysis[`teamOwner`];
+                benchTotal += parseFloat(historicWeekAnalysis[`teamBenchTotal`]);
+                activeTotal += parseFloat(historicWeekAnalysis[`teamActiveTotal`]);
+                if (historicWeekAnalysis[`teamBenchTotal`] >= benchHighScore) {
+                    benchHighScore = parseFloat(historicWeekAnalysis[`teamBenchTotal`]);
                     benchHighWeek = weekIndex;
                 }
-                teamName = weekBenchScore[0][`teamName`];
-                teamOwner = weekBenchScore[0][`teamOwner`];
+                if (historicWeekAnalysis[`teamActiveTotal`] >= activeHighScore) {
+                    activeHighScore = parseFloat(historicWeekAnalysis[`teamActiveTotal`]);
+                    activeHighWeek = weekIndex;
+                }
             });
-            const returnObj = { teamName, teamOwner, benchTotal, highBench: { benchHighScore, benchHighWeek } }
+            const returnObj = { teamName, teamOwner, activeTotal, benchTotal, activeHigh: { activeHighScore, activeHighWeek }, benchHigh: { benchHighScore, benchHighWeek } }
             utils.logJsonArray(returnObj);
             res.send(returnObj);
         }).catch(function (error) {
@@ -99,8 +105,8 @@ function historicalYearTeamBenchScore(seasonLengthUrl, targetUrl, res) {
 
 module.exports = {
     fetchRawCheerioData,
-    fetchProccessedCheerioData,
+    returnProcessedUrl,
     health,
     yearMetadata,
-    historicalYearTeamBenchScore
+    getHistoricYearTeamAnalysis
 }
