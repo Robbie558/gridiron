@@ -84,7 +84,7 @@ function getHistoricWeekTeamAnalysis(parsedHtml) {
       }
     }
   });
-  const returnObj = { teamName, teamOwner, teamBenchTotal, teamActiveTotal, rosterHighScore:{teamPlayerName, teamPlayerHighScore}, rosterPostiionScores:{teamQbTotal, teamRbTotal, teamWrTotal, teamTeTotal, teamKiTotal, teamDeTotal} };
+  const returnObj = { teamName, teamOwner, teamBenchTotal, teamActiveTotal, rosterHighScore:{teamPlayerName, teamPlayerHighScore}, rosterPostionScores:{teamQbTotal, teamRbTotal, teamWrTotal, teamTeTotal, teamKiTotal, teamDeTotal} };
   return returnObj;
 }
 

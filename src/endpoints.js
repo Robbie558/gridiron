@@ -14,15 +14,16 @@ function fetchRawCheerioData(targetUrl) {
     });
 }
 
-function returnProcessedUrl(targetUrl, cheerioFunction, res) {
-    return axios.get(targetUrl).then(response => {
+async function returnProcessedUrl(targetUrl, cheerioFunction) {
+    const processedUrl = await axios.get(targetUrl).then(response => {
         const cheerioDataObj = cheerio.load(response.data);
         let returnObj = cheerioFunction(cheerioDataObj);
         utils.logJsonArray(returnObj);
-        res.send(returnObj);
+        return returnObj;
     }).catch(function (error) {
         return { success: false, message: error };
     });
+    return processedUrl;
 }
 
 function health(res, port) {
@@ -57,13 +58,13 @@ function yearMetadata(targetUrl, res) {
             const settingsHtmlParsed = cheerio.load(settingsRes.data);
             const rosterArr = getYearRosterSettings(settingsHtmlParsed);
             let leagueConfig = getYearLeagueSettings(settingsHtmlParsed);
-            leagueConfig = { ...leagueConfig, ...{seasonLength} };
+            leagueConfig = { ...leagueConfig, ...{ seasonLength } };
             res.send({ leagueTitle, leagueConfig, playoffWeekArr, rosterArr });
         })).catch(err => console.log(err));
 }
 
 function getHistoricYearTeamAnalysis(seasonLengthUrl, targetUrl, res) {
-    const weekUrlArr = []; 
+    const weekUrlArr = [];
     let benchTotal = 0, benchHighScore = 0;
     let activeTotal = 0, activeHighScore = 0;
     let teamName, teamOwner;
