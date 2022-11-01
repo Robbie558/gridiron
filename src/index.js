@@ -3,7 +3,7 @@ const express = require('express');
 const { BASE_URL, PORT } = require('../config.js');
 
 const { health, returnProcessedUrl, getHistoricYearTeamAnalysis, yearMetadata } = require('./endpoints.js');
-const { getTeamLinks, getCurrentWeekScores, getHistoricPlayoffs, getHistoricWeekScores, getHistoricFinalStandings, getHistoricWeekTeamAnalysis, getHistoricRegularStandings } = require('./cheerio-functions.js');
+const { getTeamUrls, getCurrentWeekScores, getHistoricPlayoffs, getHistoricWeekScores, getHistoricFinalStandings, getHistoricWeekTeamAnalysis, getHistoricRegularStandings } = require('./cheerio-functions.js');
 const { sendAxiosResult } = require('./utils/utils.js');
 
 // Start express app on defined port
@@ -15,7 +15,7 @@ app.get(`/_health`, (req, res) => health(res, PORT));
 
 app.get(`/api/:league_id/teams`, (req, res) => {
   const targetUrl = BASE_URL + req.params.league_id;
-  const teamsProcessedUrl = returnProcessedUrl(targetUrl, getTeamLinks);
+  const teamsProcessedUrl = returnProcessedUrl(targetUrl, getTeamUrls);
   sendAxiosResult(teamsProcessedUrl, res);
 });
 
@@ -53,19 +53,20 @@ app.get(`/api/:league_id/metadata/:year`, (req, res) => {
 app.get(`/api/:league_id/playoffs/:year/:playoff_bracket`, (req, res) => {
   if (req.params.playoff_bracket == "championship") {
     const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/playoffs?bracketType=championship&standingsTab=playoffs";
-    const playoffProcessedUrl = returnProcessedUrl(targetUrl, getHistoricPlayoffs, res);
+    const playoffProcessedUrl = returnProcessedUrl(targetUrl, getHistoricPlayoffs);
     sendAxiosResult(playoffProcessedUrl, res);
   } 
   else if (req.params.playoff_bracket == "consolation") {
     const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/playoffs?bracketType=consolation&standingsTab=playoffs";
-    const consolationProcessedUrl = returnProcessedUrl(targetUrl, getHistoricPlayoffs, res);
+    const consolationProcessedUrl = returnProcessedUrl(targetUrl, getHistoricPlayoffs);
     sendAxiosResult(consolationProcessedUrl, res);
   }
 });
 
 app.get(`/api/:league_id/week_analysis/:team_id/:year/:week/`, (req, res) => {
   const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/teamhome?statCategory=stats&statSeason=" + req.params.year + "&statType=weekStats&statWeek=" + req.params.week + "&teamId=" + req.params.team_id + "&week=" + req.params.week;
-  const weekAnalysisProcessedUrl = returnProcessedUrl(targetUrl, getHistoricWeekTeamAnalysis, res);
+  console.log(targetUrl);
+  const weekAnalysisProcessedUrl = returnProcessedUrl(targetUrl, getHistoricWeekTeamAnalysis);
   sendAxiosResult(weekAnalysisProcessedUrl, res);
 });
 

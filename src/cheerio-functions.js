@@ -1,13 +1,13 @@
 // Public Functions 
-function getTeamLinks(parsedHtml) {
+function getTeamUrls(parsedHtml) {
   const parsedClass = parsedHtml(`.teamImageAndNameWrap`);
   let returnArr = [];
   let teamId = 0;
   parsedClass.each(function () {
     const teamName = parsedHtml(this).text();
     const ParsedLink = parsedHtml(this).children().first();
-    const teamLink = ParsedLink.attr('href');
-    returnArr.push({ teamId, teamName, teamLink })
+    const TeamUrl = ParsedLink.attr('href');
+    returnArr.push({ teamId, teamName, TeamUrl })
     teamId++;
   });
   return returnArr;
@@ -40,15 +40,15 @@ function getHistoricWeekScores(parsedHtml) {
     const firstTeamName = parsedHtml(this).children('.teamWrap-1').children('a').text();
     const firstTeamOwner = parsedHtml(this).children('.teamWrap-1').children().children().children().children('a').text();
     const firstTeamScore = parsedHtml(this).children('.teamWrap-1').children('.teamTotal').html();
-    const secondTeamName = parsedHtml(this).children('.teamWrap-2').children('a').text();
-    const secondTeamOwner = parsedHtml(this).children('.teamWrap-2').children().children().children().children('a').text();
-    const secondTeamScore = parsedHtml(this).children('.teamWrap-2').children('.teamTotal').html();
-    const matchupTitle = firstTeamName + ' vs ' + secondTeamName;
+    const lastTeamName = parsedHtml(this).children('.teamWrap-2').children('a').text();
+    const lastTeamOwner = parsedHtml(this).children('.teamWrap-2').children().children().children().children('a').text();
+    const lastTeamScore = parsedHtml(this).children('.teamWrap-2').children('.teamTotal').html();
+    const matchupTitle = firstTeamName + ' vs ' + lastTeamName;
     let matchupWinner = `${firstTeamName} (${firstTeamOwner})`
-    if (parseFloat(secondTeamScore) > parseFloat(firstTeamScore)) {
-      matchupWinner = `${secondTeamName} (${secondTeamOwner})`
+    if (parseFloat(lastTeamScore) > parseFloat(firstTeamScore)) {
+      matchupWinner = `${lastTeamName} (${lastTeamOwner})`
     }
-    scores = { firstTeamName, firstTeamOwner, firstTeamScore, secondTeamName, secondTeamOwner, secondTeamScore };
+    scores = { firstTeamName, firstTeamOwner, firstTeamScore, lastTeamName, lastTeamOwner, lastTeamScore };
     matchup = { matchupTitle, matchupWinner, scores };
     returnArr.push(matchup)
   })
@@ -214,7 +214,7 @@ function getHistoricPlayoffs(parsedHtml) {
 }
 
 module.exports = {
-  getTeamLinks,
+  getTeamUrls,
   getLeagueTitle,
   getCurrentWeekScores,
   getHistoricWeekScores,
