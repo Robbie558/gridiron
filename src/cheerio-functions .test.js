@@ -34,13 +34,13 @@ describe('Cheerio Function Tests', () => {
         expect(mockRes).toBeInstanceOf(Object);
         expect(getAxiosResult).toBeInstanceOf(Array);
         expect(getAxiosResult[0]).toBeInstanceOf(Object);
-      });
+      },10000);
 
       it('with the expected keys', () => {
 
         expect(getAxiosResult[0]).toHaveProperty('teamId', 'teamName', 'TeamUrl');
 
-      });
+      },10000);
 
     });
 
@@ -50,7 +50,7 @@ describe('Cheerio Function Tests', () => {
 
       it('should return an array of objects', async () => {
 
-        getCurrentWeekScoresMock = jest.spyOn(cheerioFunctions, "getCurrentWeekScores");
+        getCurrentWeekScoresMock = jest.spyOn(cheerioFunctions, "getCurrentWeekScores"); 
 
         const scoresUrl = BASE_URL + leagueIdMock;
 
@@ -61,7 +61,7 @@ describe('Cheerio Function Tests', () => {
         expect(mockRes).toBeInstanceOf(Object);
         expect(getAxiosResult).toBeInstanceOf(Array);
         expect(getAxiosResult[0]).toBeInstanceOf(Object);
-      });
+      },10000);
 
       it('with the expected keys', () => {
 
@@ -71,7 +71,7 @@ describe('Cheerio Function Tests', () => {
         expect(getAxiosResult[0]).toHaveProperty('scores.lastOpponentName');
         expect(getAxiosResult[0]).toHaveProperty('scores.lastOpponentScore');
 
-      });
+      },10000);
 
     });
 
@@ -92,7 +92,7 @@ describe('Cheerio Function Tests', () => {
         expect(mockRes).toBeInstanceOf(Object);
         expect(getAxiosResult).toBeInstanceOf(Array);
         expect(getAxiosResult[0]).toBeInstanceOf(Object);
-      });
+      },10000);
 
       it('with the expected keys', () => {
 
@@ -104,7 +104,7 @@ describe('Cheerio Function Tests', () => {
         expect(getAxiosResult[0]).toHaveProperty('scores.lastTeamName');
         expect(getAxiosResult[0]).toHaveProperty('scores.lastTeamOwner');
         expect(getAxiosResult[0]).toHaveProperty('scores.lastTeamScore');
-      });
+      },10000);
 
     });
 
@@ -123,13 +123,13 @@ describe('Cheerio Function Tests', () => {
         expect(mockRes).toBeInstanceOf(Object);
         expect(getAxiosResult).toBeInstanceOf(Array);
         expect(getAxiosResult[0]).toBeInstanceOf(Object);
-      });
+      },10000);
 
       it('with the expected keys', () => {
 
         expect(getAxiosResult[0]).toHaveProperty('teamRank', 'teamName', 'teamUrl');
 
-      });
+      },10000);
 
     });
 
@@ -148,13 +148,13 @@ describe('Cheerio Function Tests', () => {
         expect(mockRes).toBeInstanceOf(Object);
         expect(getAxiosResult).toBeInstanceOf(Array);
         expect(getAxiosResult[0]).toBeInstanceOf(Object);
-      });
+      },10000);
 
       it('with the expected keys', () => {
 
         expect(getAxiosResult[0]).toHaveProperty('teamRank', 'teamName', 'teamUrl');
 
-      });
+      },10000);
 
     });
 
@@ -175,7 +175,7 @@ describe('Cheerio Function Tests', () => {
         expect(mockRes).toBeInstanceOf(Object);
         expect(getAxiosResult).toBeInstanceOf(Array);
         expect(getAxiosResult[0]).toBeInstanceOf(Object);
-      });
+      },10000);
 
       it('with the expected keys', () => {
 
@@ -186,7 +186,7 @@ describe('Cheerio Function Tests', () => {
         expect(getAxiosResult[0]).toHaveProperty('matchupArr[0].teamArr[0].playoffTeamName');
         expect(getAxiosResult[0]).toHaveProperty('matchupArr[0].teamArr[0].playoffTeamSeed');
         expect(getAxiosResult[0]).toHaveProperty('matchupArr[0].teamArr[0].playoffTeamScore');
-      });
+      },10000);
 
     });
 
@@ -207,7 +207,7 @@ describe('Cheerio Function Tests', () => {
         expect(mockRes).toBeInstanceOf(Object);
         expect(getAxiosResult).toBeInstanceOf(Array);
         expect(getAxiosResult[0]).toBeInstanceOf(Object);
-      });
+      },10000);
 
       it('with the expected keys', () => {
 
@@ -218,7 +218,7 @@ describe('Cheerio Function Tests', () => {
         expect(getAxiosResult[0]).toHaveProperty('matchupArr[0].teamArr[0].playoffTeamName');
         expect(getAxiosResult[0]).toHaveProperty('matchupArr[0].teamArr[0].playoffTeamSeed');
         expect(getAxiosResult[0]).toHaveProperty('matchupArr[0].teamArr[0].playoffTeamScore');
-      });
+      },10000);
 
     });
 
@@ -238,7 +238,7 @@ describe('Cheerio Function Tests', () => {
         expect(returnProcessedUrlMock).toHaveBeenCalledWith(`https://fantasy.nfl.com/league/2285751/history/${leagueYearMock}/teamhome?statCategory=stats&statSeason=2020&statType=weekStats&statWeek=1&teamId=1&week=1`, getHistoricWeekTeamAnalysisMock);
         expect(mockRes).toBeInstanceOf(Object);
         expect(getAxiosResult).toBeInstanceOf(Object);
-      });
+      },10000);
 
       it('with the expected keys', () => {
 
@@ -255,7 +255,7 @@ describe('Cheerio Function Tests', () => {
         expect(getAxiosResult).toHaveProperty('rosterPostionScores.teamKiTotal');
         expect(getAxiosResult).toHaveProperty('rosterPostionScores.teamDeTotal');
 
-      });
+      },10000);
 
     });
 

@@ -30,7 +30,7 @@ function health(res, port) {
     res.send(`GridIron is UP on port ${port}`);
 }
 
-async function yearMetadata(targetUrl, res) {
+async function yearMetadata(targetUrl) {
     const weekUrl = targetUrl;
     console.log(`Week Count URL: ${weekUrl}`);
     const titleUrl = targetUrl.replace(/history.*/, ``);
