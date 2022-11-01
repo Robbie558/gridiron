@@ -46,8 +46,8 @@ app.get(`/api/:league_id/standings/:year/:standing_type`, (req, res) => {
 
 app.get(`/api/:league_id/metadata/:year`, (req, res) => {
   const targetUrl = BASE_URL + req.params.league_id + "/history/" + req.params.year + "/schedule" + "?gameSeason=" + req.params.year + "&leagueId=" + req.params.league_id + "&scheduleDetail=1" + "&scheduleType=week" + "&standingsTab=schedule";
-  // TODO - Split out handling of the response
-  yearMetadata(targetUrl, res);
+  const metadataProcessedUrl = yearMetadata(targetUrl, res);
+  sendAxiosResult(metadataProcessedUrl, res);
 });
 
 app.get(`/api/:league_id/playoffs/:year/:playoff_bracket`, (req, res) => {

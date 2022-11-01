@@ -30,7 +30,7 @@ function health(res, port) {
     res.send(`GridIron is UP on port ${port}`);
 }
 
-function yearMetadata(targetUrl, res) {
+async function yearMetadata(targetUrl, res) {
     const weekUrl = targetUrl;
     console.log(`Week Count URL: ${weekUrl}`);
     const titleUrl = targetUrl.replace(/history.*/, ``);
@@ -39,12 +39,11 @@ function yearMetadata(targetUrl, res) {
     console.log(`Playoff Week Count URL: ${playoffUrl}`);
     const settingsUrl = targetUrl.replace(/schedule\?.*/, `settings`);
     console.log(`Settings URL: ${settingsUrl}`);
-    Promise.all([
+    const metaDataRes = await Promise.all([
         axios.get(weekUrl),
         axios.get(titleUrl),
         axios.get(playoffUrl),
         axios.get(settingsUrl)]).then(axios.spread((weekRes, titleRes, playoffWeekRes, settingsRes) => {
-            let returnArr = [];
             // Get weeks in year
             const weeksHtmlParsed = cheerio.load(weekRes.data);
             const seasonLength = getweeksInYear(weeksHtmlParsed);
@@ -59,8 +58,11 @@ function yearMetadata(targetUrl, res) {
             const rosterArr = getYearRosterSettings(settingsHtmlParsed);
             let leagueConfig = getYearLeagueSettings(settingsHtmlParsed);
             leagueConfig = { ...leagueConfig, ...{ seasonLength } };
-            res.send({ leagueTitle, leagueConfig, playoffWeekArr, rosterArr });
-        })).catch(err => console.log(err));
+            return { leagueTitle, leagueConfig, playoffWeekArr, rosterArr };
+        })).catch(function (error) {
+            return { success: false, message: error };
+        });
+    return metaDataRes;
 }
 
 function getHistoricYearTeamAnalysis(seasonLengthUrl, targetUrl, res) {

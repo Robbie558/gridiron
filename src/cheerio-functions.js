@@ -124,7 +124,6 @@ function getYearLeagueSettings(parsedHtml) {
       teamCount = parsedHtml(this).children(`div`).text();
     }
   });
-  console.log(draftFormat);
   return { teamCount, commissioner, draftFormat, draftType };
 }
 
