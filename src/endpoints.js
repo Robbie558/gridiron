@@ -84,14 +84,14 @@ function getHistoricYearTeamAnalysis(seasonLengthUrl, targetUrl, res) {
                 let historicWeekAnalysis = getHistoricWeekTeamAnalysis(weekObj[`data`]);
                 teamName = historicWeekAnalysis[`teamName`];
                 teamOwner = historicWeekAnalysis[`teamOwner`];
-                benchTotal += parseFloat(historicWeekAnalysis[`teamBenchTotal`]);
-                activeTotal += parseFloat(historicWeekAnalysis[`teamActiveTotal`]);
-                if (historicWeekAnalysis[`teamBenchTotal`] >= benchHighScore) {
-                    benchHighScore = parseFloat(historicWeekAnalysis[`teamBenchTotal`]);
+                benchTotal += parseFloat(historicWeekAnalysis[`benchTeamTotal`]);
+                activeTotal += parseFloat(historicWeekAnalysis[`activeTeamTotal`]);
+                if (historicWeekAnalysis[`benchTeamTotal`] >= benchHighScore) {
+                    benchHighScore = parseFloat(historicWeekAnalysis[`benchTeamTotal`]);
                     benchHighWeek = weekIndex;
                 }
-                if (historicWeekAnalysis[`teamActiveTotal`] >= activeHighScore) {
-                    activeHighScore = parseFloat(historicWeekAnalysis[`teamActiveTotal`]);
+                if (historicWeekAnalysis[`activeTeamTotal`] >= activeHighScore) {
+                    activeHighScore = parseFloat(historicWeekAnalysis[`activeTeamTotal`]);
                     activeHighWeek = weekIndex;
                 }
             });

@@ -244,10 +244,16 @@ describe('Cheerio Function Tests', () => {
 
         expect(getAxiosResult).toHaveProperty('teamName');
         expect(getAxiosResult).toHaveProperty('teamOwner');
-        expect(getAxiosResult).toHaveProperty('teamBenchTotal');
-        expect(getAxiosResult).toHaveProperty('teamActiveTotal');
-        expect(getAxiosResult).toHaveProperty('rosterHighScore.teamPlayerName');
-        expect(getAxiosResult).toHaveProperty('rosterHighScore.teamPlayerHighScore');
+        expect(getAxiosResult).toHaveProperty('benchTeamTotal');
+        expect(getAxiosResult).toHaveProperty('activeTeamTotal');
+        expect(getAxiosResult).toHaveProperty('rosterHighScores.active.activePlayerHighName');
+        expect(getAxiosResult).toHaveProperty('rosterHighScores.active.activePlayerHighScore');
+        expect(getAxiosResult).toHaveProperty('rosterHighScores.bench.benchPlayerHighName');
+        expect(getAxiosResult).toHaveProperty('rosterHighScores.bench.benchPlayerHighScore');
+        expect(getAxiosResult).toHaveProperty('rosterLowScores.active.activePlayerLowName');
+        expect(getAxiosResult).toHaveProperty('rosterLowScores.active.activePlayerLowScore');
+        expect(getAxiosResult).toHaveProperty('rosterLowScores.bench.benchPlayerLowName');
+        expect(getAxiosResult).toHaveProperty('rosterLowScores.bench.benchPlayerLowScore');
         expect(getAxiosResult).toHaveProperty('rosterPostionScores.teamQbTotal');
         expect(getAxiosResult).toHaveProperty('rosterPostionScores.teamRbTotal');
         expect(getAxiosResult).toHaveProperty('rosterPostionScores.teamWrTotal');
