@@ -69,7 +69,8 @@ function getHistoricYearTeamAnalysis(seasonLengthUrl, targetUrl, res) {
     const weekUrlArr = [];
     let benchTotal = 0, benchHighScore = 0;
     let activeTotal = 0, activeHighScore = 0;
-    let teamName, teamOwner;
+    let activeHighestScore = 0, benchHighestScore = 0;
+    let teamName, teamOwner, activeHighestName, benchHighestName;
     // Build Weekly Score URLs
     axios.get(seasonLengthUrl).then(seasonLengthResponse => {
         const seasonLengthParsed = cheerio.load(seasonLengthResponse.data);
@@ -82,20 +83,46 @@ function getHistoricYearTeamAnalysis(seasonLengthUrl, targetUrl, res) {
         Promise.all(weekUrlArr.map(fetchRawCheerioData)).then(allResponse => {
             allResponse.forEach((weekObj, weekIndex) => {
                 let historicWeekAnalysis = getHistoricWeekTeamAnalysis(weekObj[`data`]);
+                let weekActivePlayerHighScore = historicWeekAnalysis[`rosterHighScores`].active.activePlayerHighScore;
+                let weekActivePlayerHighName = historicWeekAnalysis[`rosterHighScores`].active.activePlayerHighName;
+                let weekBenchPlayerHighScore = historicWeekAnalysis[`rosterHighScores`].bench.benchPlayerHighScore;
+                let weekBenchPlayerHighName = historicWeekAnalysis[`rosterHighScores`].bench.benchPlayerHighName;
                 teamName = historicWeekAnalysis[`teamName`];
                 teamOwner = historicWeekAnalysis[`teamOwner`];
                 benchTotal += parseFloat(historicWeekAnalysis[`benchTeamTotal`]);
                 activeTotal += parseFloat(historicWeekAnalysis[`activeTeamTotal`]);
+                // Active Analysis
+                if (historicWeekAnalysis[`activeTeamTotal`] >= activeHighScore) {
+                    activeHighScore = parseFloat(historicWeekAnalysis[`activeTeamTotal`]);
+                    activeHighsWeek = weekIndex;
+                }
+                if (weekActivePlayerHighScore > activeHighestScore) {
+                    activeHighestScore = weekActivePlayerHighScore;
+                    activeHighestName = weekActivePlayerHighName;
+                }
+                // Bench Analysis
                 if (historicWeekAnalysis[`benchTeamTotal`] >= benchHighScore) {
                     benchHighScore = parseFloat(historicWeekAnalysis[`benchTeamTotal`]);
                     benchHighWeek = weekIndex;
                 }
-                if (historicWeekAnalysis[`activeTeamTotal`] >= activeHighScore) {
-                    activeHighScore = parseFloat(historicWeekAnalysis[`activeTeamTotal`]);
-                    activeHighWeek = weekIndex;
+                if (weekBenchPlayerHighScore > benchHighestScore) {
+                    benchHighestScore = weekBenchPlayerHighScore;
+                    benchHighestName = weekBenchPlayerHighName;
                 }
             });
-            const returnObj = { teamName, teamOwner, activeTotal, benchTotal, activeHigh: { activeHighScore, activeHighWeek }, benchHigh: { benchHighScore, benchHighWeek } }
+            const returnObj = {
+                teamName, teamOwner, activeTotal, benchTotal,
+                rosterHighScores: {
+                    active: {
+                        week: { activeHighScore, activeHighsWeek },
+                        player: { activeHighestScore, activeHighestName} 
+                    },
+                    bench: { 
+                        week: { benchHighScore, benchHighWeek},
+                        player: { benchHighestScore, benchHighestName} 
+                 }
+                }
+            }
             utils.logJsonArray(returnObj);
             res.send(returnObj);
         }).catch(function (error) {

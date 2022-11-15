@@ -3,6 +3,7 @@ function logJsonArray(inputArr) {
   console.log(`Results for target league: ${JSON.stringify(inputArr)}`);
 }
 
+// Async Public Functions
 async function sendAxiosResult(axiosGetPromise, response) {
   const axiosGetResult = await axiosGetPromise;
   response.send(axiosGetResult);

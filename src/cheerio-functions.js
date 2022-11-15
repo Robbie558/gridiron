@@ -68,7 +68,6 @@ function getHistoricWeekTeamAnalysis(parsedHtml) {
     rosteredPlayerName = parsedHtml(this).children(`.playerNameAndInfo`).children(`div`).children(`a`).text();
     rosteredPlayerWeekScore = parseFloat(parsedHtml(this).children(`.stat`).children(`.playerTotal`).text());
     if (/^BN/.test(rosteredPlayerPosition)) {
-      benchTeamTotal += rosteredPlayerWeekScore;
       if (rosteredPlayerWeekScore > benchPlayerLowScore ){
         benchPlayerHighScore = rosteredPlayerWeekScore;
         benchPlayerHighName = rosteredPlayerName;
