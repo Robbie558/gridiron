@@ -14,7 +14,8 @@ app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
 app.get(`/_health`, (req, res) => health(res, PORT));
 
 app.get(`/api/:league_id/teams`, (req, res) => {
-  const targetUrl = BASE_URL + req.params.league_id;
+  const targetUrl = BASE_URL + req.params.league_id + "?standingsTab=standings";
+  console.log(targetUrl);
   const teamsProcessedUrl = returnProcessedUrl(targetUrl, getTeamUrls);
   sendAxiosResult(teamsProcessedUrl, res);
 });

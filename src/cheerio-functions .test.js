@@ -25,12 +25,12 @@ describe('Cheerio Function Tests', () => {
 
         getTeamUrlsMock = jest.spyOn(cheerioFunctions, "getTeamUrls");
 
-        const teamUrl = BASE_URL + leagueIdMock;
+        const teamUrl = BASE_URL + leagueIdMock + "?standingsTab=standings";
 
         mockRes = await returnProcessedUrlMock(teamUrl, getTeamUrlsMock);
         getAxiosResult = await returnAxiosResultMock(mockRes);
 
-        expect(returnProcessedUrlMock).toHaveBeenCalledWith(`https://fantasy.nfl.com/league/${leagueIdMock}`, getTeamUrlsMock);
+        expect(returnProcessedUrlMock).toHaveBeenCalledWith(`https://fantasy.nfl.com/league/${leagueIdMock}?standingsTab=standings`, getTeamUrlsMock);
         expect(mockRes).toBeInstanceOf(Object);
         expect(getAxiosResult).toBeInstanceOf(Array);
         expect(getAxiosResult[0]).toBeInstanceOf(Object);
